@@ -1,0 +1,87 @@
+
+<!-- //////////////////////Main-Started/////////////////////// -->
+<main>
+  <div class="hero-wrap" style="background-image: url('../../../../assets/images/bg_1.jpg');">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row no-gutters slider-text d-flex align-itemd-end justify-content-center">
+        <div class="col-md-9 ftco-animate text-center d-flex align-items-end justify-content-center">
+          <div class="text">
+            <h1 class="mb-4 bread">{{ 'auth.forgotPassword' | translate }}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ========================================================================= -->
+  <section id="contact-page" class="p-t-120 p-b-80 " >
+    <div class="container">
+      <div class="row align-items-center justify-content-center">
+        <div class="col-lg-12">
+          <div class="wrapper">
+            <div class="content">
+              <div class="login-wrap">
+                <div class="login-content">
+                  <div class="login-logo">
+
+                    <h1 class="mb-2 bread"></h1>
+                  </div>
+                  <div class="login-form">
+                    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="fromGroup">
+                      <app-alert></app-alert>
+                      <div class="form-group">
+                        <label>{{ 'filed.emailPhone' | translate }}</label>
+                        <input class="au-input au-input--full"
+                               formControlName="login"
+                               type="text"
+                               name="login"
+                               required
+                               placeholder="{{ 'filed.emailPhoneUsername' | translate }}"
+                               [ngClass]="{ 'is-invalid': fromGroup.controls?.['login']?.invalid && fromGroup.controls?.['login']?.touched }"
+                        >
+                        <div *ngIf=" !submitted &&fromGroup.controls?.['login']?.invalid ||fromGroup.controls?.['login']?.touched"
+                             class="invalid-feedback">
+                          <div *ngIf="fromGroup.controls?.['login']?.errors"
+                               class="pull-right">{{ 'common.required' | translate }}</div>
+                        </div>
+                      </div>
+
+                      <button class="au-btn au-btn--block au-btn--green m-b-20 m-t-15"
+                              type="submit"
+                              [disabled]="fromGroup.invalid">{{ 'common.submit' | translate }}
+                      </button>
+                    </form>
+
+                    <div class="card" style=" border: none; padding: 0; margin: 0">
+
+                      <div class="card-body">
+                        <button [routerLink]="['/home/sign-in']" data-toggle="tooltip" tooltip="  {{ 'auth.alreadyHave' | translate }}" type="button" class="btn btn-link btn-sm">
+                          {{ 'auth.signIn' | translate }}</button>
+
+                        <button [routerLink]="['../sign-up']" data-toggle="tooltip" tooltip=" {{ 'auth.doNotHave' | translate }}" type="button" class="btn btn-link btn-sm">
+                          {{ 'auth.signUp' | translate }}</button>
+
+                        <button [routerLink]="['../reset-password']" data-toggle="tooltip" tooltip="   {{ 'auth.needResetPassword' | translate }}" type="button" class="btn btn-link btn-sm">
+                          {{ 'auth.resetPassword' | translate }}</button>
+                        <button [routerLink]="['../activation']" data-toggle="tooltip" tooltip="   {{ 'auth.needActivateAccount' | translate }}" type="button" class="btn btn-link btn-sm">
+                          {{ 'auth.activationAccount' | translate }}</button>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- row -->
+    </div>
+  </section>
+
+
+  <!-- ========================================================================= -->
+
+</main>

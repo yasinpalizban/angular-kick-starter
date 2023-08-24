@@ -1,0 +1,273 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header" style="direction: ltr">
+        <fa-icon [icon]="faIcon.faList"></fa-icon>
+        <strong class="card-title pl-2">  {{ 'dashboard.chartData' | translate }} </strong>
+      </div>
+      <div class="card-body">
+        <form novalidate (ngSubmit)="onSubmit()" [formGroup]="formGroup">
+
+
+          <div class="form-group">
+            <app-alert></app-alert>
+          </div>
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">{{ 'dashboard.type' | translate }}</div>
+              <select
+
+                id="_type"
+                name="_type"
+                class="form-control"
+                formControlName="_type"
+                required
+                [ngClass]="{ 'is-invalid': formGroup.controls?.['_type']?.invalid  && formGroup.controls?.['_type']?.touched }"
+                [value]=""
+              >
+                <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
+                <option value="news">{{ 'dashboard.news' | translate }}</option>
+                <option value="visitor">{{ 'dashboard.visitor' | translate }}</option>
+                <option value="request">{{ 'dashboard.request' | translate }}</option>
+                <option value="music">{{ 'dashboard.room' | translate }}</option>
+                <option value="music">{{ 'dashboard.food' | translate }}</option>
+              </select>
+              <div class="input-group-addon">
+                <fa-icon [icon]="faIcon.faAsterisk"></fa-icon>
+              </div>
+
+              <div
+                *ngIf=" !submitted &&formGroup.controls?.['_type']?.invalid ||formGroup.controls?.['_type']?.touched"
+                class="invalid-feedback">
+                <div *ngIf="formGroup.controls?.['_type']?.hasError('required')"
+                     class="pull-right">{{ 'common.required' | translate }}
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-group">
+
+
+              <div class="input-group-addon">{{ 'dashboard.date' | translate }}</div>
+
+              <div class="form-control form-check-inline form-check" style="border: none">
+                <label for="inline-checkbox0"
+                       class="switch col-form-label-sm switch-text switch-primary switch-pill m-r-10 m-l-20">
+                  {{ 'common.none' | translate }}
+                </label>
+                <input
+                  name="date"
+                  formControlName="date"
+                  type="radio"
+                  id="inline-checkbox0"
+                  value="none"
+                  class="form-check-input witch-input">
+                <label for="inline-checkbox1"
+                       class="switch col-form-label-sm switch-text switch-primary switch-pill m-r-10 m-l-20">
+                  {{ 'dashboard.today' | translate }}
+                </label>
+                <input
+                  name="date"
+                  formControlName="date"
+                  type="radio"
+                  id="inline-checkbox1"
+                  value="today"
+                  class="form-check-input witch-input">
+                <label for="inline-checkbox2" class="switch col-form-label-sm  switch-text  m-r-10 m-l-20">
+                  {{ 'dashboard.lastWeek' | translate }}
+
+                </label>
+                <input
+                  name="date"
+                  formControlName="date"
+                  type="radio"
+                  id="inline-checkbox2"
+                  value="lastWeek"
+                  class="form-check-input witch-input">
+                <label for="inline-checkbox3"
+                       class="switch col-form-label-sm switch-text switch-primary switch-pill m-r-10 m-l-20">
+                  {{ 'dashboard.lastMonth' | translate }}
+
+                </label>
+                <input
+                  name="date"
+                  formControlName="date"
+                  type="radio"
+                  id="inline-checkbox3"
+                  value="lastMonth"
+                  class="form-check-input witch-input">
+              </div>
+              <div class="input-group-addon">
+                <fa-icon [icon]="faIcon.faCalendar"></fa-icon>
+              </div>
+
+            </div>
+          </div>
+          <!--          <div class="form-group">-->
+          <!--            <div class="input-group">-->
+          <!--              <div class="input-group-addon">{{ 'dashboard.date' | translate }}</div>-->
+          <!--              <select-->
+
+          <!--                id="date"-->
+          <!--                name="date"-->
+          <!--                class="form-control"-->
+          <!--                formControlName="date"-->
+
+          <!--                [ngClass]="{ 'is-invalid': formGroup.controls.date.invalid  && formGroup.controls.date.touched }"-->
+          <!--                [value]=""-->
+          <!--              >-->
+          <!--                <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>-->
+          <!--                <option value="today">{{ 'dashboard.today' | translate }}</option>-->
+          <!--                <option value="lastWeek">{{ 'dashboard.lastWeek' | translate }}</option>-->
+          <!--                <option value="lastMonth">{{ 'dashboard.lastMonth' | translate }}</option>-->
+
+          <!--              </select>-->
+          <!--              <div class="input-group-addon">-->
+          <!--                <fa-icon [icon]="faIcon.faCalendar"></fa-icon>-->
+          <!--              </div>-->
+
+          <!--              <div-->
+          <!--                *ngIf=" !submitted &&formGroup.controls.date.invalid ||formGroup.controls.date.touched"-->
+          <!--                class="invalid-feedback">-->
+          <!--                <div *ngIf="formGroup.controls.date.hasError('required')"-->
+          <!--                     class="pull-right">{{ 'common.required' | translate }}-->
+          <!--                </div>-->
+
+          <!--              </div>-->
+          <!--            </div>-->
+          <!--          </div>-->
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">{{ 'dashboard.fromDate' | translate }}</div>
+              <input type="date"
+
+                     id="fromDate"
+                     name="fromDate"
+                     class="form-control"
+                     formControlName="fromDate"
+
+                     [ngClass]="{ 'is-invalid': formGroup.controls?.['fromDate']?.invalid  && formGroup.controls?.['fromDate']?.touched }"
+                     [value]=""
+              >
+              <div class="input-group-addon">
+                <fa-icon [icon]="faIcon.faCalendar"></fa-icon>
+              </div>
+              <div
+                *ngIf=" !submitted &&formGroup.controls?.['fromDate']?.invalid ||formGroup.controls?.['fromDate']?.touched"
+                class="invalid-feedback">
+                <div *ngIf="formGroup.controls?.['fromDate']?.hasError('required')"
+                     class="pull-right">{{ 'common.required' | translate }}
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">{{ 'dashboard.toDate' | translate }}</div>
+              <input type="date"
+                     id="toDate"
+                     name="toDate"
+                     class="form-control"
+                     formControlName="toDate"
+
+                     [ngClass]="{ 'is-invalid': formGroup.controls?.['toDate']?.invalid  && formGroup.controls?.['toDate']?.touched }"
+                     [value]=""
+              >
+              <div class="input-group-addon">
+                <fa-icon [icon]="faIcon.faCalendar"></fa-icon>
+              </div>
+              <div
+                *ngIf=" !submitted &&formGroup.controls?.['toDate']?.invalid ||formGroup.controls?.['toDate']?.touched"
+                class="invalid-feedback">
+                <div *ngIf="formGroup.controls?.['toDate']?.hasError('required')"
+                     class="pull-right">{{ 'common.required' | translate }}
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-actions form-group ">
+            <button [disabled]="formGroup.invalid" _type="submit"
+                    class="btn btn-primary btn-sm">{{ 'common.submit' | translate }}</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header" style="direction: ltr">
+        <fa-icon [icon]="faIcon.faChartArea"></fa-icon>
+        <strong class="card-title pl-2">{{ 'dashboard.chart' | translate }} </strong>
+      </div>
+      <div class="card-body">
+        <!-- DATA TABLE-->
+
+        <ngx-charts-bar-vertical
+          [view]="[600, 400]"
+          [scheme]="colorScheme"
+          [results]="graphData.data!"
+          [gradient]="gradient"
+          [xAxis]="showXAxis"
+          [yAxis]="showYAxis"
+          [legend]="showLegend"
+          [showXAxisLabel]="showXAxisLabel"
+          [showYAxisLabel]="showYAxisLabel"
+          [xAxisLabel]="xAxisLabel"
+          [yAxisLabel]="yAxisLabel"
+        >
+        </ngx-charts-bar-vertical>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header" style="direction: ltr">
+        <fa-icon [icon]="faIcon.faChartArea"></fa-icon>
+        <strong class="card-title pl-2">{{ 'dashboard.chart' | translate }} </strong>
+      </div>
+      <div class="card-body">
+        <!-- DATA TABLE-->
+
+        <ngx-charts-pie-chart
+          [results]="graphData.data!"
+          [legend]="true"
+          [legendTitle]="'Product Sale Report'"
+          [view]="[600,400]"
+          [labels]="true">
+        </ngx-charts-pie-chart>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-header" style="direction: ltr">
+        <fa-icon [icon]="faIcon.faChartArea"></fa-icon>
+        <strong class="card-title pl-2">{{ 'dashboard.chart' | translate }} </strong>
+      </div>
+      <div class="card-body">
+        <!-- DATA TABLE-->
+
+        <ngx-charts-pie-grid
+          [results]="graphData.data!">
+        </ngx-charts-pie-grid>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
