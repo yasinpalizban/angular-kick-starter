@@ -79,6 +79,7 @@
     "fullName": "نام نام خانودگی"
   },
   "common": {
+    "newItem": "آیتم جدید",
     "confirm": "تایید",
     "cancel": "لغو",
     "delete": "حذف",
@@ -106,6 +107,7 @@
     "next": "بعدی ",
     "messageCreate": "داده های جدید ذخیره شدند",
     "messageUpdate": "داده ها بروز رسانی شدند",
+    "messageDelete": "داده ها حذف شدند",
     "sendEmailLink": "ارسال لینک فعال سازی",
     "sendSmsCode": "ارسال کد پیامک ",
     "advanceSearch": "جستو جی پیشرفته",

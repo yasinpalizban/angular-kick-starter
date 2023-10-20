@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, DoCheck, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
-import {Subscription} from "rxjs";
+import {Subscription, takeUntil} from "rxjs";
 import {HomeService} from "../../services/home.service";
 import {IHome} from "../../interfaces/home.interface";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
@@ -7,13 +7,14 @@ import {environment} from "../../../environments/environment";
 import {
   faUser, faCalendarAlt, faStar, faBook, faBookReader,
   faCertificate, faTasks, faPuzzlePiece, faUniversity,
-  faBicycle, faShieldAlt, faGraduationCap,faCar,faSearch,
+  faBicycle, faShieldAlt, faGraduationCap, faCar, faSearch,
   faEllipsisH
 } from "@fortawesome/free-solid-svg-icons";
 import {HeaderService} from "../../services/header.service";
 import {faFacebookF, faGooglePlus, faInstagram, faTwitter} from "@fortawesome/free-brands-svg-icons";
 
 import {IQuery} from "../../interfaces/query.interface";
+import {MainAbstract} from "../../abstracts/main.abstract";
 
 @Component({
   selector: 'app-home',
@@ -21,43 +22,36 @@ import {IQuery} from "../../interfaces/query.interface";
   styleUrls: ['./home.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  subscription: Subscription[];
+export class HomeComponent extends MainAbstract implements OnInit, OnDestroy {
+
   siteUrl = environment.siteUrl;
 
   faIcon = {
     faUser, faCalendarAlt, faStar, faBook, faFacebookF, faInstagram,
     faGooglePlus, faTwitter, faCertificate, faBookReader, faTasks, faPuzzlePiece,
-    faBicycle, faUniversity, faShieldAlt, faGraduationCap, faEllipsisH,faCar,faSearch
+    faBicycle, faUniversity, faShieldAlt, faGraduationCap, faEllipsisH, faCar, faSearch
   };
+  direction: string = "ltr";
 
-  direction: string;
-
-
-  constructor(private  homeService: HomeService,
+  constructor(private homeService: HomeService,
               private sanitizer: DomSanitizer,
               private headerService: HeaderService
   ) {
-    this.subscription = [new Subscription()];
-    this.direction = "ltr";
+    super();
 
   }
 
   ngOnInit(): void {
 
-    this.subscription.push(this.headerService.getLanguage().subscribe((item) => {
+    this.headerService.getLanguage().pipe(takeUntil(this.subscription$)).subscribe((item) => {
       if (item == 'en') {
         this.direction = 'ltr';
       } else {
         this.direction = 'rtl';
       }
-    }));
+    });
 
     // this.homeService.visitorSave();
-
-    this.subscription.push(this.homeService.getDataObservable().subscribe((data: IHome) => {
-
-    }));
 
   }
 
@@ -74,13 +68,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscription.forEach(sub => sub.unsubscribe());
-  }
-
-  trimArray(array:any,start: number, end: number): any {
-
-    return array?.data?.slice(start, end );
+  trimArray(array: any, start: number, end: number): any {
+    return array?.data?.slice(start, end);
   }
 
 }

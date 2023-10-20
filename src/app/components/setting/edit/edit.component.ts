@@ -3,55 +3,33 @@ import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {SettingService} from '../../../services/setting.service';
 import {Setting} from '../../../models/setting.model';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
+import {Subscription, switchMap, takeUntil} from 'rxjs';
 
 import {ISetting} from '../../../interfaces/setting.interface';
 import {IQuery} from '../../../interfaces/query.interface';
 import {LocationChangeListener} from "@angular/common";
 import {faAddressBook, faEye, faFileWord} from "@fortawesome/free-solid-svg-icons";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {SETTING_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-setting-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
+export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
   faIcon = {
     faEye, faFileWord, faAddressBook
   };
-  formGroup!: FormGroup;
-  submitted: boolean;
-  editId: number;
-  subscription$: Subscription[];
-  settingDetail!: ISetting;
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.settingService.getQueryArgumentObservable().subscribe((qParams) => {
-      params = qParams;
-    }));
-
-    this.settingService.setQueryArgument(params);
-    this.router.navigate(['./admin/setting/list'], {
-      queryParams: params,
-
-    });
-  }
+  settingDetail!: ResponseObject<ISetting>;
 
   constructor(private formBuilder: FormBuilder,
               private settingService: SettingService,
-              private aRoute: ActivatedRoute,
-              private router: Router) {
-    this.submitted = false;
-    this.editId = 0;
-
-
-    this.subscription$ = [];
+              private activatedRoute: ActivatedRoute,
+              protected override router: Router) {
+    super(router);
   }
 
   ngOnInit(): void {
@@ -74,20 +52,20 @@ export class EditComponent implements OnInit, OnDestroy {
     });
 
 
-    this.subscription$.push(this.aRoute.params.pipe().subscribe((params: Params) => {
-
-      this.editId = +params['id'];
-
-    }));
-    this.settingService.query(this.editId);
-    this.subscription$.push(this.settingService.getDataObservable().subscribe((setting) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) => this.settingService.query(+params['id'])
+      )).subscribe((setting) => {
       this.settingDetail = setting;
-      this.formGroup.controls['_key'].setValue(setting.data![0].key);
-      this.formGroup.controls['_value'].setValue(setting.data![0].value);
-      this.formGroup.controls['description'].setValue(setting.data![0].description);
-      this.formGroup.controls['status'].setValue( +setting.data![0].status);
+      this.formGroup.controls['_key'].setValue(setting.data.key);
+      this.formGroup.controls['_value'].setValue(setting.data.value);
+      this.formGroup.controls['description'].setValue(setting.data.description);
+      this.formGroup.controls['status'].setValue(+setting.data.status);
+    });
 
-    }));
+    this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams) => {
+      this.params = qParams;
+      this.path = SETTING_SERVICE.base;
+    });
   }
 
   onSubmit(): void {
@@ -103,17 +81,16 @@ export class EditComponent implements OnInit, OnDestroy {
       id: this.editId,
       value: this.formGroup.value._value.toUpperCase(),
       description: this.formGroup.value.description,
-      status: this.formGroup.value.status==1,
+      status: this.formGroup.value.status == 1,
     });
     this.settingService.clearAlert();
     this.settingService.update(setting);
 
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
     this.settingService.unsubscribe();
+    this.unSubscription();
   }
 
 

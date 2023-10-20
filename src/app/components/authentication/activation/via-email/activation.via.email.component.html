@@ -1,0 +1,52 @@
+<form novalidate (ngSubmit)="onSubmit()" [formGroup]="formGroup">
+  <div class="form-group">
+    <app-alert></app-alert>
+  </div>
+  <div class="form-group">
+    <label>{{ 'filed.token' | translate }}</label>
+    <input
+      formControlName="token"
+      required
+      [ngClass]="{ 'is-invalid': formGroup.controls?.['token']?.invalid && formGroup.controls?.['token']?.touched }"
+      class="au-input au-input--full"
+      type="text"
+      name="token"
+      placeholder="{{ 'filed.token' | translate }}">
+    <div *ngIf=" !submitted &&formGroup.controls?.['token']?.invalid ||formGroup.controls?.['token']?.touched"
+         class="invalid-feedback">
+      <div *ngIf="formGroup.controls?.['token']?.errors"
+           class="pull-right">{{ 'common.required' | translate }}</div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="m-t-10">{{ 'filed.email' | translate }}</label>
+    <input
+      formControlName="email"
+      required
+      [ngClass]="{ 'is-invalid': formGroup.controls?.['email']?.invalid && formGroup.controls?.['email']?.touched }"
+      class="au-input au-input--full"
+      type="email"
+      name="email"
+      placeholder="{{ 'filed.email' | translate }}">
+    <div *ngIf=" !submitted && formGroup.controls?.['email']?.invalid ||formGroup.controls?.['email']?.touched"
+         class="invalid-feedback">
+      <div *ngIf="formGroup.controls?.['email']?.errors"
+           class="pull-right">{{ 'common.required' | translate }}</div>
+    </div>
+  </div>
+
+  <div class="register-link">
+
+    <button
+      class="au-btn  au-btn--green   m-r-5"
+      type="submit"
+      [disabled]="formGroup.invalid">{{'common.submit'|translate}}
+    </button>
+    <button
+      class="au-btn  au-btn--blue m-l-5"
+      type="submit"
+      (click)="onSendEmail()">{{'common.sendEmailLink'|translate}}
+    </button>
+  </div>
+
+</form>

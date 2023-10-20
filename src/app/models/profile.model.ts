@@ -1,4 +1,6 @@
-export class Profile {
+import {BasicModel} from "./basic.model";
+
+export class Profile extends BasicModel {
 
   public firstName: string | undefined;
   public lastName: string | undefined;
@@ -12,7 +14,9 @@ export class Profile {
   public image: File | undefined;
   public bio: string | undefined;
   public title: string | undefined;
+
   constructor(init?: Partial<Profile>) {
+    super();
     Object.assign(this, init);
   }
 }

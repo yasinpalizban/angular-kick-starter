@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule, PreloadAllModules} from '@angular/router';
-import {NotFoundPageComponent} from './components/not-found-page/not-found-page.component';
-import {ForbiddenPageComponent} from './components/forbidden-page/forbidden-page.component';
+import {NotFoundPageComponent} from './helpers/not-found-page/not-found-page.component';
+import {ForbiddenPageComponent} from './helpers/forbidden-page/forbidden-page.component';
 
 const appRoutes: Routes = [
   {path: '', redirectTo: '/home/main', pathMatch: 'full'},

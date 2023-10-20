@@ -1,58 +1,32 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
-
-
+import {switchMap, takeUntil} from 'rxjs';
 import {IQuery} from '../../../interfaces/query.interface';
-
 import {LocationChangeListener} from "@angular/common";
-import {faFileWord, faStickyNote,faEye} from "@fortawesome/free-solid-svg-icons";
+import {faFileWord, faStickyNote, faEye} from "@fortawesome/free-solid-svg-icons";
 import {IPermission} from "../../../interfaces/permission.interface";
 import {PermissionService} from "../../../services/permission.service";
 import {Permission} from "../../../models/permission.model";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-permission-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
-  faIcon = {faStickyNote, faFileWord,faEye};
-  formGroup!: FormGroup;
-  submitted: boolean;
-  editId: number;
-  subscription$: Subscription[];
-  permissionDetail!: IPermission;
+export class EditComponent extends BasicForm implements OnInit, OnDestroy {
+  faIcon = {faStickyNote, faFileWord, faEye};
+  permissionDetail!: ResponseObject<IPermission>;
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.permissionService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-    }));
-
-    this.permissionService.setQueryArgument(params);
-    this.router.navigate(['./admin/permission/list'], {
-      queryParams: params,
-
-    });
-  }
 
   constructor(private formBuilder: FormBuilder,
               private permissionService: PermissionService,
-              private aRoute: ActivatedRoute,
-              private router: Router) {
-    this.submitted = false;
-    this.editId = 0;
-
-
-    this.subscription$ = [];
+              private activatedRoute: ActivatedRoute,
+              protected override router: Router) {
+    super(router);
   }
 
   ngOnInit(): void {
@@ -70,43 +44,37 @@ export class EditComponent implements OnInit, OnDestroy {
         Validators.maxLength(255)
       ]),
       active: new FormControl('', [
-      Validators.required,
-    ]),
+        Validators.required,
+      ]),
 
     });
 
-
-    this.subscription$.push(this.aRoute.params.pipe().subscribe((params: Params) => {
-
-      this.editId = +params['id'];
-
-    }));
-    this.permissionService.query(this.editId);
-    this.subscription$.push(this.permissionService.getDataObservable().subscribe((permission: IPermission) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) => this.permissionService.query(+params['id'])
+      )).subscribe((permission) => {
       this.permissionDetail = permission;
+      this.formGroup.controls['name'].setValue(permission.data.name);
+      this.formGroup.controls['description'].setValue(permission.data.description);
+      this.formGroup.controls['active'].setValue(permission.data.active);
+    });
 
-      this.formGroup.controls['name'].setValue(permission.data![0].name);
-      this.formGroup.controls['description'].setValue(permission.data![0].description);
-      this.formGroup.controls['active'].setValue(permission.data![0].active);
-
-    }));
+    this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path = PERMISSION_SERVICE.base;
+    });
   }
 
   onSubmit(): void {
 
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
-
     const permission = new Permission({
       id: this.editId,
       name: this.formGroup.value.name.toLowerCase(),
       description: this.formGroup.value.description,
-      active: this.formGroup.value.active==1,
-
+      active: this.formGroup.value.active == 1,
     });
 
     this.permissionService.clearAlert();
@@ -114,9 +82,8 @@ export class EditComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.permissionService.unsubscribe();
   }
 

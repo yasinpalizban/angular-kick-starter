@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 import {ProfileService} from '../../services/profile.service';
 import {faList} from "@fortawesome/free-solid-svg-icons";
@@ -8,15 +8,12 @@ import {faList} from "@fortawesome/free-solid-svg-icons";
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent  {
 
   faIcon={faList};
   constructor(private profileService: ProfileService) {
   }
 
-  ngOnInit(): void {
-
-  }
 
   onClearAlert(): void {
     this.profileService.clearAlert();

@@ -1,9 +1,6 @@
-import {IPagination} from "./pagination.interface";
 
 export interface ISetting {
 
-  pager?:IPagination;
-  data?: [{
     id: number,
     key: string,
     value: string,
@@ -12,6 +9,5 @@ export interface ISetting {
     createdAt: Date,
     updatedAt: Date,
     deletedAt: Date,
-  }];
 
 }

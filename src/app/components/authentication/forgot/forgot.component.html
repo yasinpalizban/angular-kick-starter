@@ -27,7 +27,7 @@
                     <h1 class="mb-2 bread"></h1>
                   </div>
                   <div class="login-form">
-                    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="fromGroup">
+                    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="formGroup">
                       <app-alert></app-alert>
                       <div class="form-group">
                         <label>{{ 'filed.emailPhone' | translate }}</label>
@@ -37,18 +37,18 @@
                                name="login"
                                required
                                placeholder="{{ 'filed.emailPhoneUsername' | translate }}"
-                               [ngClass]="{ 'is-invalid': fromGroup.controls?.['login']?.invalid && fromGroup.controls?.['login']?.touched }"
+                               [ngClass]="{ 'is-invalid': formGroup.controls?.['login']?.invalid && formGroup.controls?.['login']?.touched }"
                         >
-                        <div *ngIf=" !submitted &&fromGroup.controls?.['login']?.invalid ||fromGroup.controls?.['login']?.touched"
+                        <div *ngIf=" !submitted &&formGroup.controls?.['login']?.invalid ||formGroup.controls?.['login']?.touched"
                              class="invalid-feedback">
-                          <div *ngIf="fromGroup.controls?.['login']?.errors"
+                          <div *ngIf="formGroup.controls?.['login']?.errors"
                                class="pull-right">{{ 'common.required' | translate }}</div>
                         </div>
                       </div>
 
                       <button class="au-btn au-btn--block au-btn--green m-b-20 m-t-15"
                               type="submit"
-                              [disabled]="fromGroup.invalid">{{ 'common.submit' | translate }}
+                              [disabled]="formGroup.invalid">{{ 'common.submit' | translate }}
                       </button>
                     </form>
 

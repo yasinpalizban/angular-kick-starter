@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {INotification} from '../interfaces/notification.interface';
-import {BehaviorSubject, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, Observable, Subject, Subscription, takeUntil} from 'rxjs';
 import {filter} from 'rxjs/operators';
 
 import {ActivatedRoute, NavigationEnd, Params, Router} from '@angular/router';
@@ -24,22 +24,18 @@ export class HeaderService implements HeaderServiceInterface {
   pvChannel: any;
   private newNotification: BehaviorSubject<INotification> = new BehaviorSubject<INotification>({});
   private explodeLink: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-  subscription$: Subscription[];
-  url: string;
+  protected readonly subscription$: Subject<any> = new Subject<any>();
+  url: string='';
   private language: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public urlPath: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private  router: Router, private aRoute: ActivatedRoute) {
-
-    this.subscription$ = [];
-    this.url = '';
-
     try {
       this.pusher = new Pusher(environment.pusher.key, {
         cluster: environment.pusher.cluster,
         forceTLS: true
       });
-      this.subscription$.push(this.notificationChannel = this.pusher.subscribe('notification-channel'));
+      this.notificationChannel = this.pusher.pipe(takeUntil(this.subscription$)).subscribe('notification-channel');
       this.notificationChannel.bind('my-event', (notify: INotification) => {
         this.newNotification.next(notify);
       });
@@ -50,27 +46,15 @@ export class HeaderService implements HeaderServiceInterface {
   }
 
   checkUrlParams(): void {
-    this.subscription$.push(this.aRoute.url
-      .subscribe((n) => {
+    this.aRoute.url.pipe(takeUntil(this.subscription$)).subscribe((n) => {
         this.url = this.router.url;
         const value = explodeUrl(this.router.url);
         this.explodeLink.next(value);
         const val = urlPath(this.router.url);
         this.urlPath.next(val);
-      }));
+      });
 
-    // this.subscription$.push(this.router.events
-    //   .pipe(filter(event => event instanceof NavigationEnd))
-    //   .subscribe((nav: NavigationEnd) => {
-    //     this.url = nav.url;
-    //     const value = explodeUrl(nav.url);
-    //     this.explodeLink.next(value);
-    //     const val = urlPath(nav.url);
-    //     this.urlPath.next(val);
-    //   }));
-
-    this.subscription$.push(this.router.events
-      .subscribe((nav) => {
+    this.router.events.pipe(takeUntil(this.subscription$)).subscribe((nav) => {
         if (nav instanceof NavigationEnd) {
           this.url = nav.url;
           const value = explodeUrl(nav.url);
@@ -79,7 +63,7 @@ export class HeaderService implements HeaderServiceInterface {
           this.urlPath.next(val);
         }
 
-      }));
+      });
   }
 
 
@@ -89,7 +73,7 @@ export class HeaderService implements HeaderServiceInterface {
       return;
     }
     try {
-      this.subscription$.push(this.pvChannel = this.pusher.subscribe('pv-channel'));
+      this.pvChannel = this.pusher.pipe(takeUntil(this.subscription$)).subscribe('pv-channel');
       this.pvChannel.bind('my-event', () => {
         const notify: INotification = {
           type: NotificationType.newChat,
@@ -101,7 +85,7 @@ export class HeaderService implements HeaderServiceInterface {
         this.newNotification.next(notify);
       });
 
-      this.subscription$.push(this.roomChannel = this.pusher.subscribe('room-channel'));
+      this.roomChannel = this.pusher.pipe(takeUntil(this.subscription$)).subscribe('room-channel');
       this.roomChannel.bind('my-event', () => {
         const notify: INotification = {
           type: NotificationType.newChatRoom,
@@ -138,6 +122,7 @@ export class HeaderService implements HeaderServiceInterface {
     return this.language.asObservable().pipe(filter(result => !!result));
   }
   unsubscribe(): void {
-    this.subscription$.forEach(sub => sub.unsubscribe());
+    this.subscription$.next(null);
+    this.subscription$.complete();
   }
 }

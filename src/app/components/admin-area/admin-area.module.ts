@@ -18,8 +18,8 @@ import {PermissionUserModule} from "../permission-user/permission.user.module";
     HeaderComponent,
     FooterComponent,
 
-
   ],
+
   imports: [
     SharedModule,
     AdminAreaRoutingModule,
@@ -31,10 +31,6 @@ import {PermissionUserModule} from "../permission-user/permission.user.module";
     PermissionModule,
     PermissionGroupModule,
     PermissionUserModule,
-
-
-
-
   ]
 })
 export class AdminAreaModule {

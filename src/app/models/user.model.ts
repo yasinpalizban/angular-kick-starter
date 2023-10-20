@@ -1,6 +1,7 @@
-export class User {
+import {BasicModel} from "./basic.model";
 
-  public id: number | undefined;
+export class User extends BasicModel {
+
   public username: string | undefined;
   public email: string | undefined;
   public firstName: string | undefined;
@@ -12,6 +13,7 @@ export class User {
   public status: boolean | undefined;
 
   constructor(init?: Partial<User>) {
+    super();
     Object.assign(this, init);
   }
 }

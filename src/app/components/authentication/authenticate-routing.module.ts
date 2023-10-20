@@ -7,7 +7,7 @@ import {RegisterComponent} from './register/register.component';
 import {ResetPasswordComponent} from './reset-password/reset-password.component';
 import {LogoutComponent} from './logout/logout.component';
 import {ActivationComponent} from './activation/activation.component';
-import {RegisterSocialComponent} from "./register-social/register-social.component";
+
 
 
 const routes: Routes = [
@@ -21,7 +21,6 @@ const routes: Routes = [
       {path: 'sign-up', component: RegisterComponent},
       {path: 'reset-password', component: ResetPasswordComponent},
       {path: 'activation', component: ActivationComponent},
-      {path: 'sign-up-social', component: RegisterSocialComponent},
 
     ]
   }

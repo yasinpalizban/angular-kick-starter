@@ -41,18 +41,18 @@
              class="form-control"
              formControlName="description"
              required
-             [ngClass]="{ 'is-invalid':formGroup.controls.description.invalid  && formGroup.controls.description.touched }"
+             [ngClass]="{ 'is-invalid':formGroup.controls?.['description']?.invalid  && formGroup.controls?.['description']?.touched }"
              [value]=""
       >
       <div class="input-group-addon">
         <fa-icon  [icon]="faIcon.faFileWord" ></fa-icon>
       </div>
       <div
-        *ngIf=" !submitted &&formGroup.controls. description.invalid ||formGroup.controls. description.touched"
+        *ngIf=" !submitted &&formGroup.controls?.['description']?.invalid ||formGroup.controls?.['description']?.touched"
         class="invalid-feedback">
-        <div *ngIf="formGroup.controls.description.hasError('required')" class="pull-right">{{ 'common.required' | translate }}
+        <div *ngIf="formGroup.controls?.['description']?.hasError('required')" class="pull-right">{{ 'common.required' | translate }}
         </div>
-        <div *ngIf="formGroup.controls.description.hasError('maxlength')" class="pull-right">{{ 'common.canNotBe' | translate }}
+        <div *ngIf="formGroup.controls?.['description']?.hasError('maxlength')" class="pull-right">{{ 'common.canNotBe' | translate }}
         </div>
       </div>
     </div>

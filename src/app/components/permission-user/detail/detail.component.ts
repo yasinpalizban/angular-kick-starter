@@ -1,71 +1,46 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
-
-
+import {switchMap, takeUntil} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {IQuery} from '../../../interfaces/query.interface';
-
-import {LocationChangeListener} from "@angular/common";
-
 import {IPermissionUser} from "../../../interfaces/permission.user.interface";
 import {PermissionUserService} from "../../../services/permission.user.service";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicDetail} from "../../../abstracts/basic.detail";
+import {USER_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-permission-group-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
-  id: number;
-  subscription$: Subscription[];
-  permissionGroupDetail!: IPermissionUser;
+export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.userPermissionService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-
-
-    }));
-
-    this.userPermissionService.setQueryArgument(params);
-    this.router.navigate(['./admin/user-permission/list'], {
-      queryParams: params,
-
-    });
-  }
+  permissionGroupDetail!: ResponseObject<IPermissionUser>;
 
   constructor(
     private userPermissionService: PermissionUserService,
-    private aRoute: ActivatedRoute, private router: Router) {
-    this.id = 0;
-    this.subscription$ = [];
+    private activatedRoute: ActivatedRoute, protected override router: Router) {
+    super(router);
 
   }
 
   ngOnInit(): void {
 
-    this.subscription$.push(
-      this.aRoute.params.pipe().subscribe((params: Params) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) =>       this.userPermissionService.query(+params['id'])
+      )).subscribe((permission) => {
+      this.permissionGroupDetail = permission;
+    });
 
-        this.id = +params['id'];
-
-      }));
-    this.userPermissionService.query(this.id);
-    this.subscription$.push(
-      this.userPermissionService.getDataObservable().subscribe((permission: IPermissionUser ) => {
-        this.permissionGroupDetail = permission;
-      }));
+    this.userPermissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path= USER_SERVICE.base;
+    });
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
 
-    this.subscription$.forEach(sub => sub.unsubscribe());
+    this.userPermissionService.unsubscribe();
 
   }
 }

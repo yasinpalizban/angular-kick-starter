@@ -1,23 +1,25 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ProfileService} from '../../../services/profile.service';
 import {MustMatch} from '../../../utils/must-match.validator';
 import {Profile} from '../../../models/profile.model';
 import {faAsterisk} from '@fortawesome/free-solid-svg-icons';
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-user-password',
   templateUrl: './user-password.component.html',
   styleUrls: ['./user-password.component.scss']
 })
-export class UserPasswordComponent implements OnInit, OnDestroy {
+export class UserPasswordComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
-  formGroup!: FormGroup;
-  submitted: boolean;
+
 
   constructor(private formBuilder: FormBuilder,
-              private profileService: ProfileService) {
-    this.submitted = false;
+              private profileService: ProfileService,
+              protected override router: Router) {
+    super(router);
   }
 
   ngOnInit(): void {
@@ -55,8 +57,7 @@ export class UserPasswordComponent implements OnInit, OnDestroy {
     this.profileService.save(profile);
   }
 
-  ngOnDestroy(): void {
-
+  override ngOnDestroy(): void {
 
     this.profileService.unsubscribe();
   }

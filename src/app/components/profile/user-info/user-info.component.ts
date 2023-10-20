@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {Subscription} from 'rxjs';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import { takeUntil} from 'rxjs';
 import {IProfile} from '../../../interfaces/profile.interface';
 import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
@@ -14,6 +14,9 @@ import {
   faVenusMars,
   faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -21,30 +24,24 @@ import {
   templateUrl: './user-info.component.html',
   styleUrls: ['./user-info.component.scss']
 })
-export class UserInfoComponent implements OnInit, OnDestroy {
-  faIcon = {faPhone,
-    faUser,  faEnvelope,faVenusMars,
+export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
+  faIcon = {
+    faPhone,
+    faUser, faEnvelope, faVenusMars,
     faStickyNote
   };
 
-  formGroup!: FormGroup;
-  submitted = false;
-  editAble = true;
-  subscription: Subscription;
-  profileDetail: IProfile = {};
-  image: SafeUrl | string;
-  isNewImage: boolean;
+  profileDetail!: ResponseObject<IProfile>;
+  image: SafeUrl | string='assets/images/icon/default-avatar.jpg';
+  isNewImage: boolean=false;
   formData = new FormData();
 
 
   constructor(private formBuilder: FormBuilder,
               private profileService: ProfileService,
               private sanitizer: DomSanitizer,
-  ) {
-    this.submitted = false;
-    this.subscription = new Subscription();
-    this.isNewImage = false;
-    this.image = 'assets/images/icon/default-avatar.jpg';
+              protected override router: Router) {
+    super(router);
   }
 
   public getSantizeUrl(url: SafeUrl | string): SafeUrl | string {
@@ -93,8 +90,8 @@ export class UserInfoComponent implements OnInit, OnDestroy {
       ]),
       image: [null],
     });
-    this.profileService.query();
-    this.subscription = this.profileService.getDataObservable().subscribe((profile: IProfile) => {
+
+    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((profile) => {
       this.profileDetail = profile;
       this.formGroup.controls['firstName'].setValue(profile.data!.firstName);
       this.formGroup.controls['lastName'].setValue(profile.data!.lastName);
@@ -113,11 +110,8 @@ export class UserInfoComponent implements OnInit, OnDestroy {
         this.formGroup.controls['email'].disable();
       }
       if (profile.data!.image != null) {
-
         this.image = profile.data!.image;
-
       }
-
 
     });
 
@@ -152,10 +146,9 @@ export class UserInfoComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription.unsubscribe();
+  override ngOnDestroy(): void {
     this.profileService.unsubscribe();
+    this.unSubscription();
   }
 
 

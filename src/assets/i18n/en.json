@@ -80,6 +80,7 @@
     "fullName": "Full Name"
   },
   "common": {
+    "newItem": "new Item",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "detail": "Detail",
@@ -107,6 +108,7 @@
     "next": "next",
     "messageCreate": "New data saved  successfully",
     "messageUpdate": "Data updated  Successfully",
+    "messageDelete": "Data deleted  Successfully",
     "sendEmailLink": "Send Activation link",
     "sendSmsCode": "Send Sms Code",
     "advanceSearch": "Advance Search",

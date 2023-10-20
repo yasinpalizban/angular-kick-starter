@@ -1,14 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {Subscription} from 'rxjs';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
+import {takeUntil} from 'rxjs';
 import {UserService} from '../../../services/user.service';
 import {User} from '../../../models/user.model';
 import {GroupService} from "../../../services/group.service";
 import {IGroup} from "../../../interfaces/group.interface";
 import {
   faPhone,
-  faUser, faAsterisk, faEnvelope, faUsers,faStickyNote
+  faUser, faAsterisk, faEnvelope, faUsers
 } from '@fortawesome/free-solid-svg-icons';
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -16,27 +19,24 @@ import {
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss']
 })
-export class AddComponent implements OnInit, OnDestroy {
-  faIcon = {faPhone,
+export class AddComponent extends BasicForm implements OnInit, OnDestroy {
+  faIcon = {
+    faPhone,
     faUser, faAsterisk, faEnvelope, faUsers
   };
-  formGroup!: FormGroup;
-  submitted: boolean;
   defaultPassword: string;
-  groupRows!: IGroup;
-  subscription: Subscription;
+  groupRows!: ResponseObject<IGroup>;
 
   constructor(private formBuilder: FormBuilder,
               private userService: UserService,
-              private groupService: GroupService) {
-    this.submitted = false;
+              private groupService: GroupService,
+              protected override router: Router,) {
+    super(router);
     this.defaultPassword = 'abc123456';
-    this.subscription = new Subscription();
+
   }
 
   ngOnInit(): void {
-
-    this.groupService.query();
 
     this.formGroup = this.formBuilder.group({
 
@@ -64,22 +64,19 @@ export class AddComponent implements OnInit, OnDestroy {
         Validators.required,
       ])
     });
-    this.subscription = this.groupService.getDataObservable().subscribe((groups: IGroup) => {
+    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((groups) => {
       this.groupRows = groups;
-
     });
 
   }
 
   onSubmit(): void {
 
-
     if (this.formGroup.invalid) {
       return;
     }
 
     this.submitted = true;
-
     const user = new User({
       email: this.formGroup.value.email,
       phone: this.formGroup.value.phone,
@@ -88,18 +85,13 @@ export class AddComponent implements OnInit, OnDestroy {
       username: this.formGroup.value.username,
       groupId: this.formGroup.value.groupId,
       password: this.defaultPassword,
-
-
     });
 
     this.userService.clearAlert();
-
     this.userService.save(user);
-
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  override ngOnDestroy(): void {
     this.groupService.unsubscribe();
     this.userService.unsubscribe();
   }

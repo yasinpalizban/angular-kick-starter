@@ -1,15 +1,17 @@
-import {Component, HostListener, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
-
-
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {mergeMap, Subject, takeUntil} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
 import {IQuery} from '../../../interfaces/query.interface';
-
 import {faEdit, faTrash, faEnvelopeOpen} from '@fortawesome/free-solid-svg-icons';
 import {IPermission} from "../../../interfaces/permission.interface";
 import {PermissionService} from "../../../services/permission.service";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicList} from "../../../abstracts/basic.list";
+import {ModalComponent} from "../../../helpers/modal/modal.component";
+import {PERMISSION_SERVICE, SETTING_SERVICE} from "../../../configs/path.constants";
+import {take} from "rxjs/operators";
 
 
 @Component({
@@ -18,142 +20,83 @@ import {PermissionService} from "../../../services/permission.service";
   styleUrls: ['./list.component.scss'],
 
 })
-export class ListComponent implements OnInit, OnDestroy {
+export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  subscription$: Subscription[];
-  permissionRows: IPermission ;
-  totalPage: number;
-  currentPage: number;
-  sizePage: number;
-  modalRef!: BsModalRef;
-  deleteId: number;
-  deleteIndex: number;
-  deleteItem: string;
-  @HostListener('mouseenter')
-  onMouseEnter(): void  {
-    if (this.currentPage !== (+this.activatedRoute.snapshot.queryParams['page'])) {
-      this.currentPage = this.activatedRoute.snapshot.queryParams['page'] ? +this.activatedRoute.snapshot.queryParams['page'] : 1;
+  permissionRows!: ResponseObject<IPermission>;
 
-    }
-
-  }
-
-  constructor(private permissionService: PermissionService,
+  constructor(public permissionService: PermissionService,
               private router: Router,
               private modalService: BsModalService,
-              private activatedRoute: ActivatedRoute
+              protected override activatedRoute: ActivatedRoute
   ) {
-
-    this.permissionRows = {};
-    this.currentPage = 1;
-    this.totalPage = 1;
-    this.sizePage = 10;
-    this.deleteId = 0;
-    this.deleteIndex = 0;
-    this.subscription$ = [];
-    this.deleteItem = '';
+    super(activatedRoute);
   }
 
   ngOnInit(): void {
+    this.sortData = [
+      {id: 'id', text: 'Id',},
+      {id: 'name', text: 'Name',},
+      {id: 'active', text: 'Active',}
+    ];
 
-
-    this.subscription$.push(this.activatedRoute.queryParams.subscribe((params: Params) => {
-
-      if (Object.keys(params).length !== 0) {
-        this.permissionService.query(params);
-      } else {
-        this.permissionService.query();
-      }
-      this.permissionService.setQueryArgument(params);
-    }));
-
-
-    this.subscription$.push(this.permissionService.getDataObservable().subscribe((permission: IPermission ) => {
+    this.activatedRoute.queryParams.pipe(takeUntil(this.subscription$),
+      mergeMap((params) => {
+        this.permissionService.setQueryArgument(params);
+        return this.permissionService.query(params);
+      })).subscribe((permission) => {
       this.permissionRows = permission;
-
-      if(permission.pager){
+      if (permission.pager) {
         this.totalPage = permission.pager!.total;
-
-        this.currentPage = permission.pager!.currentPage;
-
+        this.currentPage = permission.pager!.currentPage + 1;
       }
-
-    }));
-
+    });
 
   }
 
-  ngOnDestroy(): void  {
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.permissionService.unsubscribe();
-
   }
 
 
-  onEditItem(id: number): void  {
-
-
-    const params: IQuery = {
-      page: this.currentPage,
-    };
-
-
-    this.subscription$.push(this.permissionService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
-    }));
-
-    this.permissionService.setQueryArgument(params);
-    this.router.navigate(['./admin/permission/edit/' + id]);
+  async onEditItem(id: number): Promise<void> {
+    await this.router.navigate([PERMISSION_SERVICE.edit + id]);
   }
 
-  onDetailItem(id: number): void  {
+  async onDetailItem(id: number): Promise<void> {
 
-    this.router.navigate(['./admin/permission/detail/' + id] );
+    await this.router.navigate([PERMISSION_SERVICE.detail + id]);
   }
 
-  onOpenModal(template: TemplateRef<string>, id: number, index: number): void  {
+  onOpenModal(id: number, index: number): void {
 
-    this.modalRef = this.modalService.show(template);
     this.deleteId = id;
     this.deleteIndex = index;
     this.deleteItem = this.permissionRows.data![index].name;
-
-  }
-
-  onModalHide(): void  {
-    this.modalRef.hide();
-
-  }
-
-  onModalConfirm(): void  {
-    this.modalRef.hide();
-
-    this.permissionService.remove(this.deleteId);
-    this.permissionRows.data!.splice(this.deleteIndex, 1);
-  }
-
-
-  onChangePaginate($event: PageChangedEvent): void  {
-
-    const params: IQuery = {
-      page: $event.page,
+    const initialState: ModalOptions = {
+      initialState: {
+        deleteItem: this.deleteItem,
+      }
     };
+    this.modalRef = this.modalService.show(ModalComponent, initialState);
+    this.modalRef.content.onClose = new Subject<boolean>();
+    this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
+      if (result) {
+        this.permissionService.remove(this.deleteId);
+        this.permissionRows.data!.splice(this.deleteIndex, 1);
+      }
+    });
+
+  }
 
 
-    this.subscription$.push(this.permissionService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
+  onChangePaginate($event: PageChangedEvent): void {
 
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
 
-    }));
-
-    this.permissionService.setQueryArgument(params);
-    this.router.navigate(['./admin/permission/list'], {
-      queryParams: params,
-
+    this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$), take(1)).subscribe((qParams: IQuery) => {
+      this.router.navigate([PERMISSION_SERVICE.list], {
+        queryParams: {...qParams, page: $event.page},
+      }).then();
     });
   }
 

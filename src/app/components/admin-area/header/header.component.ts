@@ -1,15 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
+import {Subscription, takeUntil} from 'rxjs';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-
 import {ProfileService} from '../../../services/profile.service';
-import {IProfile} from '../../../interfaces/profile.interface';
 import {environment} from '../../../../environments/environment';
 import {INotification} from '../../../interfaces/notification.interface';
 import {HeaderService} from '../../../services/header.service';
 import {NotificationType} from '../../../enums/notification.enum';
-import {NotificationIconType} from '../../../enums/notification.Icon.enum';
 import {TranslateService} from '@ngx-translate/core';
 import {AuthenticateService} from '../../../services/authenticate.service';
 import {GlobalConstants} from "../../../configs/global-constants";
@@ -18,9 +15,10 @@ import {
   faUserFriends, faUserPlus, faBlog, faShoppingCart, faNewspaper, faDesktop, faImage,
   faInbox, faComments, faEnvelope, faBookmark, faBell, faBars, faCog, faTools, faUserCircle,
   faGlobe, faLanguage, faSignOutAlt, faFile, faUserCog, faEye, faRandom, faRetweet, faShoppingBag,
-  faShoppingBasket, faListAlt, faTable,faSearch, faFileAudio
+  faShoppingBasket, faListAlt, faTable, faSearch, faFileAudio
 } from "@fortawesome/free-solid-svg-icons";
 import {IAuth} from "../../../interfaces/authenticate.interface";
+import {MainAbstract} from "../../../abstracts/main.abstract";
 
 @Component({
   selector: 'app-admin-header',
@@ -28,7 +26,7 @@ import {IAuth} from "../../../interfaces/authenticate.interface";
   styleUrls: ['./header.component.scss'],
 
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent extends MainAbstract implements OnInit, OnDestroy {
   faIcon = {
     faChartArea, faTachometerAlt, faUsers, faList, faAngleDown,
     faUserFriends, faUserPlus, faBlog, faShoppingCart, faNewspaper, faDesktop, faImage,
@@ -37,17 +35,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
     faShoppingBasket, faListAlt, faTable, faSearch, faFileAudio
   };
   limitUserMenu = GlobalConstants.limitUserMenu;
-  isRightSidebar: boolean;
-  isLeftSidebar!: boolean;
+  isRightSidebar: boolean = false;
+  isLeftSidebar: boolean = false;
   isLeftArrow: {
     account: boolean; news: boolean, homePage: boolean,
     communication: boolean; dashboard: boolean, setting: boolean,
-    product: boolean,room: boolean
+    product: boolean, room: boolean
+  } = {
+    account: true,
+    news: true,
+    homePage: true,
+    communication: true,
+    dashboard: true,
+    setting: true,
+    product: true,
+    room: true
   };
-  isSearch: boolean;
-  isNotify: boolean;
-  pathLink: string;
-  explodeLink: string[];
+  isSearch: boolean = false;
+  isNotify: boolean = false;
+  pathLink: string = '';
+  explodeLink: string[] = [];
   links: {
     chat: string,
     profile: string, setting: string, group: string, users: string,
@@ -56,80 +63,54 @@ export class HeaderComponent implements OnInit, OnDestroy {
     permission: string, userPermission: string, groupPermission: string,
     fastFoodPost: string, fastFoodOrder: string, hotelTransaction: string,
     hotelActivity: string, hotelPost: string, hotelOrder: string
+  } = {
+    overView: '/admin/dashboard/over-view',
+    graph: '/admin/dashboard/graph',
+    profile: '/admin/profile',
+    setting: '/admin/setting/list',
+    group: '/admin/group/list',
+    users: '/admin/user/list',
+    newsPost: '/admin/news-post/list',
+    advertisement: '/admin/advertisement/list',
+    contact: '/admin/contact/list',
+    viewOption: '/admin/view-option/list',
+    visitor: '/admin/visitor/list',
+    chat: '/admin/chat/contact',
+    request: '/admin/request-post/list',
+    permission: '/admin/permission/list',
+    userPermission: '/admin/permission-user/list',
+    groupPermission: '/admin/permission-group/list',
+    fastFoodPost: '/admin/food-post/list',
+    fastFoodOrder: '/admin/food-order/list',
+    hotelActivity: '/admin/hotel-order/activity',
+    hotelPost: '/admin/hotel-post/list',
+    hotelOrder: '/admin/hotel-order/list',
+    hotelTransaction: '/admin/hotel-transaction/list',
+
   };
-
-  userName: string;
-  fullName: string;
-
-  image: SafeUrl | string;
-  subscription: Subscription[];
-  notify: INotification[];
-
+  userName: string = 'NotSet';
+  fullName: string = 'NotSet';
+  image: SafeUrl | string = 'assets/images/icon/default-avatar.jpg';
+  notify: INotification[] = [];
   url!: string;
-  private userRole: string;
+  userRole: string;
 
-  constructor(private  authService: AuthenticateService,
+  constructor(private authService: AuthenticateService,
               private router: Router,
               private aRoute: ActivatedRoute,
-              private  profileService: ProfileService,
+              private profileService: ProfileService,
               private sanitizer: DomSanitizer,
               private headerService: HeaderService,
               private translate: TranslateService) {
-
+    super();
     this.pathLink = this.router.url;
-    this.image = 'assets/images/icon/default-avatar.jpg';
-    this.isRightSidebar = false;
-    this.isSearch = false;
-    this.isNotify = false;
-    this.explodeLink = [];
-    this.subscription = [];
-    this.isLeftArrow = {
-      account: true,
-      news: true,
-      homePage: true,
-      communication: true,
-      dashboard: true,
-      setting: true,
-      product: true,
-      room:true
-    };
-    this.links = {
-      overView: '/admin/dashboard/over-view',
-      graph: '/admin/dashboard/graph',
-      profile: '/admin/profile',
-      setting: '/admin/setting/list',
-      group: '/admin/group/list',
-      users: '/admin/user/list',
-      newsPost: '/admin/news-post/list',
-      advertisement: '/admin/advertisement/list',
-      contact: '/admin/contact/list',
-      viewOption: '/admin/view-option/list',
-      visitor: '/admin/visitor/list',
-      chat: '/admin/chat/contact',
-      request: '/admin/request-post/list',
-      permission: '/admin/permission/list',
-      userPermission: '/admin/permission-user/list',
-      groupPermission: '/admin/permission-group/list',
-      fastFoodPost: '/admin/food-post/list',
-      fastFoodOrder: '/admin/food-order/list',
-      hotelActivity: '/admin/hotel-order/activity',
-      hotelPost: '/admin/hotel-post/list',
-      hotelOrder: '/admin/hotel-order/list',
-      hotelTransaction: '/admin/hotel-transaction/list',
-
-    };
-    this.subscription = [];
-    this.notify = [];
-    this.fullName = 'NotSet';
-    this.userName = 'NotSet';
     this.userRole = this.authService.authChange.value.role?.name!;
-
   }
 
   ngOnInit(): void {
 
     this.headerService.checkUrlParams();
-    this.headerService.getExplodeLink().subscribe((value: string[]) => {
+    this.headerService.getExplodeLink().pipe(takeUntil(this.subscription$)).subscribe((value: string[]) => {
       this.explodeLink = value;
     });
 
@@ -139,8 +120,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.userName = profile.userInformation?.userName!;
       this.fullName = profile.userInformation?.email ? profile.userInformation?.firstName! + ' ' + profile.userInformation?.lastName! : profile.userInformation?.phone!;
     } else {
-      this.profileService.query();
-      this.subscription.push(this.profileService.getDataObservable().subscribe((profile: IProfile) => {
+      this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((profile) => {
         this.userName = profile.data!.username;
         if (this.fullName) {
           this.fullName = profile.data!.firstName + ' ' + profile.data!.lastName;
@@ -148,12 +128,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
         if (profile.data!.image != null) {
           this.image = profile.data!.image;
         }
-      }));
+      });
 
     }
 
     this.headerService.checkNotification();
-    this.subscription.push(this.headerService.getNewNotification()
+    this.headerService.getNewNotification().pipe(takeUntil(this.subscription$))
       .subscribe((notify: INotification) => {
 
         if (Object.keys(notify).length) {
@@ -163,7 +143,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
         }
 
-      }));
+      });
 
   }
 
@@ -198,10 +178,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.authService.signOut();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.profileService.unsubscribe();
     this.headerService.unsubscribe();
-    this.subscription.forEach(sub => sub.unsubscribe());
 
   }
 
@@ -267,9 +246,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       if (value[i] == this.userRole) {
         return true;
       }
-
     }
-
 
     return false;
   }

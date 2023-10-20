@@ -1,9 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {GroupService} from '../../../services/group.service';
 import {Group} from '../../../models/group.model';
-import { faStickyNote, faFileWord} from "@fortawesome/free-solid-svg-icons";
+import {faStickyNote, faFileWord} from "@fortawesome/free-solid-svg-icons";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -11,14 +12,14 @@ import { faStickyNote, faFileWord} from "@fortawesome/free-solid-svg-icons";
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss']
 })
-export class AddComponent implements OnInit , OnDestroy{
-  faIcon = { faStickyNote, faFileWord};
-  formGroup!: FormGroup;
-  submitted: boolean;
+export class AddComponent extends BasicForm implements OnInit, OnDestroy {
+  faIcon = {faStickyNote, faFileWord};
+
 
   constructor(private formBuilder: FormBuilder,
-              private groupService: GroupService) {
-    this.submitted = false;
+              private groupService: GroupService,
+              protected  override  router: Router) {
+    super(router);
 
 
   }
@@ -41,7 +42,7 @@ export class AddComponent implements OnInit , OnDestroy{
 
   }
 
-  onSubmit(): void  {
+  onSubmit(): void {
 
 
     if (this.formGroup.invalid) {
@@ -60,7 +61,7 @@ export class AddComponent implements OnInit , OnDestroy{
 
   }
 
-  ngOnDestroy(): void  {
+  override ngOnDestroy(): void {
 
     this.groupService.unsubscribe();
   }

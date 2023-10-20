@@ -29,7 +29,7 @@
                     <h1 class="mb-2 bread"></h1>
                   </div>
                   <div class="login-form">
-                    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="fromGroup">
+                    <form novalidate (ngSubmit)="onSubmit()" [formGroup]="formGroup">
                       <div class="form-group">
                         <app-alert></app-alert>
                       </div>
@@ -38,14 +38,14 @@
                         <input
                           formControlName="username"
                           required
-                          [ngClass]="{ 'is-invalid': fromGroup.controls?.['username']?.invalid && fromGroup.controls?.['username']?.touched }"
+                          [ngClass]="{ 'is-invalid': formGroup.controls?.['username']?.invalid && formGroup.controls?.['username']?.touched }"
                           class="au-input au-input--full"
                           type="text"
                           name="username"
                           placeholder="{{ 'filed.userName' | translate }}">
-                        <div *ngIf=" !submitted &&fromGroup.controls?.['username']?.invalid ||fromGroup.controls?.['username']?.touched"
+                        <div *ngIf=" !submitted &&formGroup.controls?.['username']?.invalid ||formGroup.controls?.['username']?.touched"
                              class="invalid-feedback">
-                          <div *ngIf="fromGroup.controls?.['username']?.errors"
+                          <div *ngIf="formGroup.controls?.['username']?.errors"
                                class="pull-right">{{ 'common.required' | translate }}</div>
                         </div>
                       </div>
@@ -54,14 +54,14 @@
                         <input
                           formControlName="login"
                           required
-                          [ngClass]="{ 'is-invalid': fromGroup.controls?.['login']?.invalid && fromGroup.controls?.['login']?.touched }"
+                          [ngClass]="{ 'is-invalid': formGroup.controls?.['login']?.invalid && formGroup.controls?.['login']?.touched }"
                           class="au-input au-input--full"
                           type="text"
                           name="login"
                           placeholder="{{ 'filed.emailPhone' | translate }}">
-                        <div *ngIf=" !submitted &&fromGroup.controls?.['login']?.invalid ||fromGroup.controls?.['login']?.touched"
+                        <div *ngIf=" !submitted &&formGroup.controls?.['login']?.invalid ||formGroup.controls?.['login']?.touched"
                              class="invalid-feedback">
-                          <div *ngIf="fromGroup.controls?.['login']?.errors"
+                          <div *ngIf="formGroup.controls?.['login']?.errors"
                                class="pull-right">{{ 'common.required' | translate }}</div>
                         </div>
                       </div>
@@ -71,15 +71,15 @@
                         <input
                           formControlName="password"
                           required
-                          [ngClass]="{ 'is-invalid': fromGroup.controls?.['password']?.invalid && fromGroup.controls?.['password']?.touched }"
+                          [ngClass]="{ 'is-invalid': formGroup.controls?.['password']?.invalid && formGroup.controls?.['password']?.touched }"
 
                           class="au-input au-input--full"
                           type="password"
                           name="password"
                           placeholder="Password">
-                        <div *ngIf=" !submitted &&fromGroup.controls?.['password']?.invalid ||fromGroup.controls?.['password']?.touched"
+                        <div *ngIf=" !submitted &&formGroup.controls?.['password']?.invalid ||formGroup.controls?.['password']?.touched"
                              class="invalid-feedback">
-                          <div *ngIf="fromGroup.controls?.['password']?.errors"
+                          <div *ngIf="formGroup.controls?.['password']?.errors"
                                class="pull-right">{{ 'common.required' | translate }}</div>
                         </div>
                       </div>
@@ -88,17 +88,17 @@
                         <input
                           formControlName="passConfirm"
                           required
-                          [ngClass]="{ 'is-invalid': fromGroup.controls?.['passConfirm']?.invalid && fromGroup.controls?.['passConfirm']?.touched }"
+                          [ngClass]="{ 'is-invalid': formGroup.controls?.['passConfirm']?.invalid && formGroup.controls?.['passConfirm']?.touched }"
                           class="au-input au-input--full"
                           type="password"
                           name="passConfirm"
                           placeholder="{{ 'filed.passwordConfirm' | translate }}">
                         <div
-                          *ngIf=" !submitted &&fromGroup.controls?.['passConfirm']?.invalid ||fromGroup.controls?.['passConfirm']?.touched"
+                          *ngIf=" !submitted &&formGroup.controls?.['passConfirm']?.invalid ||formGroup.controls?.['passConfirm']?.touched"
                           class="invalid-feedback">
-                          <div *ngIf="fromGroup.controls?.['passConfirm']?.errors?.['required']"
+                          <div *ngIf="formGroup.controls?.['passConfirm']?.errors?.['required']"
                                class="pull-right">{{ 'common.required' | translate }}</div>
-                          <div *ngIf="fromGroup.controls?.['passConfirm']?.errors?.['mustMatch']"
+                          <div *ngIf="formGroup.controls?.['passConfirm']?.errors?.['mustMatch']"
                                class="pull-right">{{ 'common.notEqual' | translate }}</div>
                         </div>
                       </div>
@@ -110,7 +110,7 @@
                       <button
                         class="au-btn au-btn--block au-btn--green m-b-20 m-t-15"
                         type="submit"
-                        [disabled]="fromGroup.invalid">{{ 'auth.register' | translate }}</button>
+                        [disabled]="formGroup.invalid">{{ 'auth.register' | translate }}</button>
                       <div class="">
                         <div class="register-link">
                           <button (click)="signInWithFB()" class="btn  btn-primary m-r-5">

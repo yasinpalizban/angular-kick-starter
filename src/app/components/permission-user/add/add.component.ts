@@ -1,22 +1,19 @@
-import {Component, EventEmitter, OnDestroy, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
-
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import {PermissionUserService} from "../../../services/permission.user.service";
 import {PermissionUser} from "../../../models/permission.user.model";
 import {IGroup} from "../../../interfaces/group.interface";
 import {GroupService} from "../../../services/group.service";
-import {Subscription} from "rxjs";
+import {takeUntil} from "rxjs";
 import {IPermission} from "../../../interfaces/permission.interface";
 import {PermissionService} from "../../../services/permission.service";
 import {PermissionType} from "../../../enums/permission.enum";
 import {UserService} from "../../../services/user.service";
-import {IQuery} from "../../../interfaces/query.interface";
-import {ISearch} from "../../../interfaces/search.interface";
-import {HttpParams} from "@angular/common/http";
 import {IUser} from "../../../interfaces/user.interface";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -24,23 +21,22 @@ import {FunctionSearchType} from "../../../enums/function.search.enum";
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss']
 })
-export class AddComponent implements OnInit, OnDestroy {
+export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
-  formGroup!: FormGroup;
-  submitted: boolean;
-  groupRows!: IGroup;
-  permissionRows!: IPermission;
-  usersRows!: IUser;
-  subscription: Subscription[];
+
+  groupRows!: ResponseObject<IGroup>;
+  permissionRows!: ResponseObject<IPermission>;
+  usersRows!: ResponseObject<IUser>;
   actionsArray: any;
 
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
-              private  permissionService: PermissionService,
-              private  userService: UserService,
-              private userPermissionService: PermissionUserService) {
-    this.submitted = false;
-    this.subscription = [new Subscription()];
+              private permissionService: PermissionService,
+              private userService: UserService,
+              private userPermissionService: PermissionUserService,
+              protected override router: Router) {
+
+    super(router);
     this.actionsArray = [
       {value: "-get", name: PermissionType.Get},
       {value: "-post", name: PermissionType.Post},
@@ -63,46 +59,21 @@ export class AddComponent implements OnInit, OnDestroy {
         Validators.maxLength(255)
       ]),
       actions: this.formBuilder.array([], [Validators.required])
-
     });
-    const search: ISearch = {
-      fun: FunctionSearchType.Where,
-      sgn: '!=',
-      val: 'member'
-    };
 
-    const queryParam = new HttpParams().append('name', JSON.stringify(search));
-
-
-    const groupQuery: IQuery = {
-      q: queryParam
-    }
-    this.groupService.query(groupQuery);
-
-    this.subscription.push(
-      this.groupService.getDataObservable().subscribe((groups: IGroup) => {
-        this.groupRows = groups;
-
-      })
-    );
-
-    this.permissionService.query();
-    this.subscription.push(
-      this.permissionService.getDataObservable().subscribe((permission: IPermission) => {
-        this.permissionRows = permission;
-      })
-    );
-
+    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((groups) => {
+      this.groupRows = groups;
+    });
+    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((permission) => {
+      this.permissionRows = permission;
+    });
 
   }
 
   onSubmit(): void {
-
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     let combineAction = '';
@@ -112,18 +83,16 @@ export class AddComponent implements OnInit, OnDestroy {
       permissionId: this.formGroup.value.permissionId,
       userId: this.formGroup.value.userId,
       actions: combineAction
-
     });
     this.userPermissionService.clearAlert();
     this.userPermissionService.save(userPermission);
 
   }
 
-  ngOnDestroy(): void {
-    this.subscription.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.userPermissionService.unsubscribe();
   }
-
 
   onCheckboxChange(e: any) {
 
@@ -139,29 +108,10 @@ export class AddComponent implements OnInit, OnDestroy {
   }
 
   onChangeGroup(value: any): void {
-
-
-    const search: ISearch = {
-      fun: FunctionSearchType.Where,
-      sgn: '=',
-      jin: 'auth_groups',
-      val: value.target.value
-    };
-
-
-    const queryParam = new HttpParams().append('name', JSON.stringify(search));
-    const params: IQuery = {
-      q: queryParam
-    };
-
-
-    this.userService.query(params);
-
-    this.subscription.push(this.userService.getDataObservable().subscribe((users: IUser) => {
+    const queryParam = `foreignKey=${value.target.value}`;
+    this.userService.query(queryParam).pipe(takeUntil(this.subscription$)).subscribe((users) => {
       this.usersRows = users;
-      console.log(users);
-
-    }));
+    });
 
   }
 }

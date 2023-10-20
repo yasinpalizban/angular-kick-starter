@@ -1,11 +1,13 @@
-export class Permission {
+import {BasicModel} from "./basic.model";
 
-  public id: number | undefined;
+export class Permission extends BasicModel {
+
   public name: string | undefined;
   public active: boolean | undefined;
   public description: string | undefined;
 
   constructor(init?: Partial<Permission>) {
+    super();
     Object.assign(this, init);
   }
 }

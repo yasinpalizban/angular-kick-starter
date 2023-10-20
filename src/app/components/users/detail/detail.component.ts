@@ -1,66 +1,41 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
-
-
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {switchMap, takeUntil} from 'rxjs';
 import {UserService} from '../../../services/user.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {IQuery} from '../../../interfaces/query.interface';
 import {IUser} from '../../../interfaces/user.interface';
-import {LocationChangeListener} from "@angular/common";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicDetail} from "../../../abstracts/basic.detail";
+import {USER_SERVICE} from "../../../configs/path.constants";
+
 
 @Component({
   selector: 'app-user-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
-  id: number;
-  subscription$: Subscription[];
-  userDetail!: IUser;
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.userService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-      params = qParams;
-    }));
-
-    this.userService.setQueryArgument(params);
-    this.router.navigate(['./admin/user/list'], {
-      queryParams: params,
-
-    });
-  }
+export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
+  userDetail!: ResponseObject<IUser>;
 
   constructor(
     private userService: UserService,
-    private aRoute: ActivatedRoute, private router: Router) {
-    this.id = 0;
-    this.subscription$ = [];
+    private activatedRoute: ActivatedRoute, protected override router: Router) {
+    super(router);
 
   }
 
   ngOnInit(): void {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) =>  this.userService.query(+params['id'])
+      )).subscribe((user) => {
+      this.userDetail = user;
+    });
 
-    this.subscription$.push(
-      this.aRoute.params.pipe().subscribe((params: Params) => {
 
-        this.id = +params['id'];
-
-      }));
-    this.userService.query(this.id);
-    this.subscription$.push(
-      this.userService.getDataObservable().subscribe((user: IUser) => {
-        this.userDetail = user;
-      }));
+    this.userService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path = USER_SERVICE.base;
+    });
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
-
-  }
 }

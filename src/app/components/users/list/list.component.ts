@@ -1,17 +1,18 @@
-import {Component, HostListener, OnDestroy, OnInit, TemplateRef} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {mergeMap, Subject, takeUntil} from 'rxjs';
 import {UserService} from '../../../services/user.service';
-
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
 import {IQuery} from '../../../interfaces/query.interface';
 import {IUser} from '../../../interfaces/user.interface';
-import {HttpParams} from '@angular/common/http';
-import {ISearch} from '../../../interfaces/search.interface';
-import {RoleType} from '../../../enums/role.enum';
 import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicList} from "../../../abstracts/basic.list";
+import {ModalComponent} from "../../../helpers/modal/modal.component";
+import {GroupService} from "../../../services/group.service";
+import {take} from "rxjs/operators";
+import {SETTING_SERVICE, USER_SERVICE} from "../../../configs/path.constants";
 
 
 @Component({
@@ -20,154 +21,95 @@ import {FunctionSearchType} from "../../../enums/function.search.enum";
   styleUrls: ['./list.component.scss'],
 
 })
-export class ListComponent implements OnInit, OnDestroy {
+export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  subscription$: Subscription[];
-  userRows!: IUser;
-  totalPage: number;
-  currentPage: number;
-  sizePage: number;
-  modalRef!: BsModalRef;
-  deleteId: number;
-  deleteIndex: number;
-  deleteItem: string;
+  userRows!: ResponseObject<IUser>;
+  groupRows: any[] = [];
 
-  @HostListener('mouseenter')
-  onMouseEnter(): void {
-    if (this.currentPage !== (+this.activatedRoute.snapshot.queryParams['page'])) {
-      this.currentPage = this.activatedRoute.snapshot.queryParams['page'] ? +this.activatedRoute.snapshot.queryParams['page'] : 1;
-
-    }
-
-  }
-
-  constructor(private userService: UserService,
+  constructor(public userService: UserService,
               private router: Router,
+              protected override activatedRoute: ActivatedRoute,
               private modalService: BsModalService,
-              private activatedRoute: ActivatedRoute
+              private groupService: GroupService
   ) {
-
-    this.currentPage = 1;
-    this.totalPage = 1;
-    this.sizePage = 10;
-    this.deleteId = 0;
-    this.deleteIndex = 0;
-    this.deleteItem = '';
-    this.subscription$ = [];
+    super(activatedRoute);
 
   }
 
   ngOnInit(): void {
 
+    this.sortData = [
+      {id: 'id', text: 'Id',},
+      {id: 'email', text: 'Email',},
+      {id: 'username', text: 'Username',},
+      {id: 'activate', text: 'Activate',}
+    ];
 
-    this.subscription$.push(this.activatedRoute.queryParams.subscribe((params: Params) => {
-      let queryParam = new HttpParams();
-      const searchRule: ISearch = {
-        fun: FunctionSearchType.Where,
-        sgn: '=',
-        jin: 'GroupModel',
-        val: RoleType.Member
-      };
-
-      queryParam = queryParam.append('name', JSON.stringify(searchRule));
-      const query: IQuery = {
-        q: queryParam
-      };
-      if (Object.keys(params).length !== 0) {
-        this.userService.query(params);
+    this.activatedRoute.queryParams.pipe(takeUntil(this.subscription$),
+      mergeMap((params) => {
         this.userService.setQueryArgument(params);
-      } else {
-        this.userService.query(query);
-        this.userService.setQueryArgument(query);
-
-      }
-
-    }));
-
-
-    this.subscription$.push(this.userService.getDataObservable().subscribe((users: IUser) => {
+        return this.userService.query(params);
+      })).subscribe((users) => {
       this.userRows = users;
-
-      if(users.pager){
+      if (users.pager) {
         this.totalPage = users.pager!.total;
-
-        this.currentPage = users.pager!.currentPage;
-
+        this.currentPage = users.pager!.currentPage + 1;
       }
+    });
 
-    }));
+
+    this.groupService.query({limit: 100}).pipe(takeUntil(this.subscription$)).subscribe((groups) => {
+      groups.data.map((item: any) => {
+        this.groupRows.push({id: item.id, text: item.name});
+      })
+    });
 
 
   }
 
-  ngOnDestroy(): void {
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.userService.unsubscribe();
-
   }
 
 
-  onEditItem(id: number): void {
-    const params: IQuery = {
-      page: this.currentPage
-    };
+  async onEditItem(id: number): Promise<void> {
 
-
-    this.subscription$.push(this.userService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
-    }));
-
-    this.userService.setQueryArgument(params);
-    this.router.navigate(['./admin/user/edit/' + id]);
+    await this.router.navigate([USER_SERVICE.edit + id]);
   }
 
-  onDetailItem(id: number): void {
+  async onDetailItem(id: number): Promise<void> {
 
-    this.router.navigate(['./admin/user/detail/' + id]);
+    await this.router.navigate([USER_SERVICE.detail + id]);
   }
 
-  onOpenModal(template: TemplateRef<string>, id: number, index: number): void {
+  onOpenModal(id: number, index: number): void {
 
-    this.modalRef = this.modalService.show(template);
     this.deleteId = id;
     this.deleteIndex = index;
     this.deleteItem = this.userRows.data![index].username;
+    const initialState: ModalOptions = {
+      initialState: {
+        deleteItem: this.deleteItem,
+      }
+    };
+    this.modalRef = this.modalService.show(ModalComponent, initialState);
+    this.modalRef.content.onClose = new Subject<boolean>();
+    this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
+      if (result) {
+        this.userService.remove(this.deleteId);
+        this.userRows.data?.splice(this.deleteIndex, 1);
+      }
+    });
 
-  }
-
-  onModalHide(): void {
-    this.modalRef.hide();
-
-  }
-
-  onModalConfirm(): void {
-    this.modalRef.hide();
-
-    this.userService.remove(this.deleteId);
-    this.userRows.data!.splice(this.deleteIndex, 1);
   }
 
 
   onChangePaginate($event: PageChangedEvent): void {
-
-    const params: IQuery = {
-      page: $event.page,
-    };
-
-
-    this.subscription$.push(this.userService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
-    }));
-
-    this.userService.setQueryArgument(params);
-    this.router.navigate(['./admin/user/list'], {
-      queryParams: params,
-
+    this.userService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$), take(1)).subscribe((qParams: IQuery) => {
+      this.router.navigate([USER_SERVICE.list], {
+        queryParams: {...qParams, page: $event.page},
+      }).then();
     });
   }
 

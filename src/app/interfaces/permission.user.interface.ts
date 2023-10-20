@@ -1,9 +1,6 @@
-import {IPagination} from "./pagination.interface";
 
 export interface IPermissionUser {
 
-  pager?:IPagination;
-  data?: [{
     id: number,
     permissionId: number,
     userId: number,
@@ -12,6 +9,5 @@ export interface IPermissionUser {
     username: string,
     firstName: string,
     lastName: string,
-  }];
 
 }

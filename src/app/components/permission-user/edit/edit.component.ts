@@ -1,13 +1,8 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
+import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
-
-
+import {switchMap, takeUntil} from 'rxjs';
 import {IQuery} from '../../../interfaces/query.interface';
-
-import {LocationChangeListener} from "@angular/common";
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import {IPermissionUser} from "../../../interfaces/permission.user.interface";
 import {PermissionUserService} from "../../../services/permission.user.service";
@@ -17,27 +12,24 @@ import {IPermission} from "../../../interfaces/permission.interface";
 import {GroupService} from "../../../services/group.service";
 import {PermissionService} from "../../../services/permission.service";
 import {PermissionType} from "../../../enums/permission.enum";
-import {ISearch} from "../../../interfaces/search.interface";
-import {HttpParams} from "@angular/common/http";
 import {IUser} from "../../../interfaces/user.interface";
 import {UserService} from "../../../services/user.service";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {USER_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-permission-group-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
+export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
-  formGroup!: FormGroup;
-  submitted: boolean;
-  editId: number;
-  subscription: Subscription[];
-  permissionUserDetail!: IPermissionUser;
-  groupRows!: IGroup;
-  permissionRows!: IPermission;
-  usersRows!: IUser;
+
+  permissionUserDetail!: ResponseObject<IPermissionUser>;
+  groupRows!: ResponseObject<IGroup>;
+  permissionRows!: ResponseObject<IPermission>;
+  usersRows!: ResponseObject<IUser>;
   actionsArray: any;
   isGet: boolean;
   isPut: boolean;
@@ -45,42 +37,22 @@ export class EditComponent implements OnInit, OnDestroy {
   isDelete: boolean;
   isCheck: boolean;
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription.push(this.userPermissionService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-    }));
-
-    this.userPermissionService.setQueryArgument(params);
-    this.router.navigate(['./admin/user-permission/list'], {
-      queryParams: params,
-
-    });
-  }
 
   constructor(private formBuilder: FormBuilder,
               private userPermissionService: PermissionUserService,
-              private aRoute: ActivatedRoute,
-              private router: Router,
+              private activatedRoute: ActivatedRoute,
+              protected override router: Router,
               private groupService: GroupService,
-              private  userService: UserService,
-              private  permissionService: PermissionService,
+              private userService: UserService,
+              private permissionService: PermissionService,
   ) {
-    this.submitted = false;
-    this.editId = 0;
-
-
+    super(router);
     this.isDelete = false;
     this.isGet = false;
     this.isPost = false;
     this.isPut = false;
     this.isCheck = false;
-    this.subscription = [];
+
     this.actionsArray = [
       {value: "-get", name: PermissionType.Get},
       {value: "-post", name: PermissionType.Post},
@@ -106,38 +78,24 @@ export class EditComponent implements OnInit, OnDestroy {
     });
 
 
-    this.subscription.push(this.aRoute.params.pipe().subscribe((params: Params) => {
-
-      this.editId = +params['id'];
-
-    }));
-
-
-    this.groupService.query();
-
-    this.subscription.push(
-      this.groupService.getDataObservable().subscribe((groups: IGroup) => {
-        this.groupRows = groups;
-
-      })
-    );
-    this.permissionService.query();
-    this.subscription.push(
-      this.permissionService.getDataObservable().subscribe((permision: IPermission) => {
-        this.permissionRows = permision;
-      })
-    );
-    this.userPermissionService.query(this.editId);
-    this.subscription.push(this.userPermissionService.getDataObservable().subscribe((permission: IPermissionUser) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) =>       this.userPermissionService.query(+params['id'])
+      )).subscribe((permission) => {
       this.permissionUserDetail = permission;
-
-      this.formGroup.controls['userId'].setValue(permission.data![0].userId);
-      this.formGroup.controls['permissionId'].setValue(permission.data![0].permissionId);
-
-    }));
+      this.formGroup.controls['userId'].setValue(permission.data.userId);
+      this.formGroup.controls['permissionId'].setValue(permission.data.permissionId);
+    });
 
 
-    this.permissionUserDetail.data![0].actions.split("-").forEach(value => {
+    this.groupService.query({limit:100}).pipe(takeUntil(this.subscription$)).subscribe((groups) => {
+      this.groupRows = groups;
+    });
+
+    this.permissionService.query({limit:200}).pipe(takeUntil(this.subscription$)).subscribe((permision) => {
+      this.permissionRows = permision;
+    });
+
+    this.permissionUserDetail.data.actions.split("-").forEach((value: string) => {
 
       if (value === "get")
         this.isGet = true;
@@ -151,6 +109,11 @@ export class EditComponent implements OnInit, OnDestroy {
         this.isDelete = true;
 
     });
+    this.userPermissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path= USER_SERVICE.base;
+    });
+
   }
 
   onSubmit(): void {
@@ -166,7 +129,6 @@ export class EditComponent implements OnInit, OnDestroy {
     actions.controls.forEach(ctl => combineAction += ctl.value);
 
 
-
     const userPermission = new PermissionUser({
       id: this.editId,
       userId: this.formGroup.value.userId,
@@ -180,9 +142,8 @@ export class EditComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.userPermissionService.unsubscribe();
   }
 
@@ -192,22 +153,19 @@ export class EditComponent implements OnInit, OnDestroy {
 
     if (!this.isCheck) {
       this.isCheck = true;
-      const actBox = this.permissionUserDetail.data![0].actions.split("-");
-      actBox.forEach(value => {
+      const actBox = this.permissionUserDetail.data.actions.split("-");
+      actBox.forEach((value: string) => {
         if (value)
           actions.push(new FormControl("-" + value));
 
       });
     }
     if (e.target.checked) {
-
       const index = actions.controls.findIndex(x => x.value === e.target.value);
       if (index == -1)
         actions.push(new FormControl(e.target.value));
     } else {
-
       const index = actions.controls.findIndex(x => x.value === e.target.value);
-
       actions.removeAt(index);
     }
 
@@ -216,29 +174,12 @@ export class EditComponent implements OnInit, OnDestroy {
 
 
   onChangeGroup(value: any): void {
-
-
-    const search: ISearch = {
-      fun: FunctionSearchType.Where,
-      sgn: '=',
-      jin: 'auth_groups',
-      val: value.target.value
-    };
-
-
-    const queryParam = new HttpParams().append('name', JSON.stringify(search));
-    const params: IQuery = {
-      q: queryParam
-    };
-
-
-    this.userService.query(params);
-
-    this.subscription.push(this.userService.getDataObservable().subscribe((users: IUser) => {
+    const params = `foreignKey=${value.target.value}`;
+    this.userService.query(params).pipe(takeUntil(this.subscription$)).subscribe((users) => {
       this.usersRows = users;
 
 
-    }));
+    });
 
   }
 }

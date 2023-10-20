@@ -5,60 +5,60 @@
     <!--    <tr>-->
     <!--      <td>{{ 'filed.image' | translate }}</td>-->
 
-    <!--      <td>{{this.userDetail.data![0].image  }}</td>-->
+    <!--      <td>{{this.userDetail.data.image  }}</td>-->
     <!--    </tr>-->
     <tr>
       <td>{{ 'filed.userName' | translate }}</td>
 
-      <td>{{this.userDetail.data![0].username  }}</td>
+      <td>{{this.userDetail.data.username  }}</td>
     </tr>
     <tr>
       <td>{{ 'filed.email' | translate }}</td>
-      <td>{{this.userDetail.data![0].email}}</td>
+      <td>{{this.userDetail.data.email}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.phone' | translate }}</td>
-      <td>{{this.userDetail.data![0].phone}}</td>
+      <td>{{this.userDetail.data.phone}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.group' | translate }}</td>
-      <td>{{this.userDetail.data![0].group}}</td>
+      <td>{{this.userDetail.data.group}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.firstName' | translate }}</td>
-      <td>{{this.userDetail.data![0].firstName}}</td>
+      <td>{{this.userDetail.data.firstName}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.lastName' | translate }}</td>
-      <td>{{this.userDetail.data![0].lastName}}</td>
+      <td>{{this.userDetail.data.lastName}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.gender' | translate }}</td>
-      <td>{{this.userDetail.data![0].gender}}</td>
+      <td>{{this.userDetail.data.gender}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.country' | translate }}</td>
-      <td>{{this.userDetail.data![0].country}}</td>
+      <td>{{this.userDetail.data.country}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.city' | translate }}</td>
-      <td>{{this.userDetail.data![0].city}}</td>
+      <td>{{this.userDetail.data.city}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.address' | translate }}</td>
-      <td>{{this.userDetail.data![0].address}}</td>
+      <td>{{this.userDetail.data.address}}</td>
     </tr>
 
 
     <tr>
       <td>{{ 'filed.activate' | translate }}</td>
       <td>
-        <span *ngIf="this.userDetail.data![0].active==true"
+        <span *ngIf="this.userDetail.data.active==true"
               class="status--process"> {{ 'filed.activate' | translate }}</span>
-        <span *ngIf="this.userDetail.data![0].active==false"
+        <span *ngIf="this.userDetail.data.active==false"
               class="status--denied"> {{ 'filed.deActivate' | translate }}</span>
 
       </td>
@@ -66,21 +66,21 @@
     <tr>
       <td>{{ 'filed.status' | translate }}</td>
       <td>
-        <span *ngIf="this.userDetail.data![0].status==true"
+        <span *ngIf="this.userDetail.data.status==true"
               class="status--process"> {{ 'filed.activate' | translate }}</span>
-        <span *ngIf="this.userDetail.data![0].status==false"
+        <span *ngIf="this.userDetail.data.status==false"
               class="status--denied"> {{ 'filed.deActivate' | translate }}</span>
 
       </td>
     </tr>
     <tr>
       <td>{{ 'filed.description' | translate }}</td>
-      <td>{{this.userDetail.data![0].createdAt|date}}</td>
+      <td>{{this.userDetail.data.createdAt|date}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.create' | translate }}</td>
-      <td>{{this.userDetail.data![0].createdAt|date}}</td>
+      <td>{{this.userDetail.data.createdAt|date}}</td>
     </tr>
 
     </tbody>

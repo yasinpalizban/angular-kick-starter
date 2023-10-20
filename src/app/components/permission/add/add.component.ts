@@ -1,26 +1,22 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
-
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import { faStickyNote, faFileWord, faEye} from "@fortawesome/free-solid-svg-icons";
 import {PermissionService} from "../../../services/permission.service";
 import {Permission} from "../../../models/permission.model";
-
-
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 @Component({
   selector: 'app-permission-add',
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss']
 })
-export class AddComponent implements OnInit , OnDestroy{
+export class AddComponent extends BasicForm implements OnInit , OnDestroy{
   faIcon = { faStickyNote, faFileWord,faEye};
-  formGroup!: FormGroup;
-  submitted: boolean;
 
   constructor(private formBuilder: FormBuilder,
-              private permissionService: PermissionService) {
-    this.submitted = false;
-
+              private permissionService: PermissionService
+              ,protected  override router:Router ) {
+ super(router);
 
   }
 
@@ -65,7 +61,7 @@ export class AddComponent implements OnInit , OnDestroy{
 
   }
 
-  ngOnDestroy(): void  {
+  override ngOnDestroy(): void  {
 
     this.permissionService.unsubscribe();
   }

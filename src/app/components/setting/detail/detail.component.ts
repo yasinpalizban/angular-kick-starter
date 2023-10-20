@@ -1,68 +1,41 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Component, OnInit} from '@angular/core';
+import { switchMap, takeUntil} from 'rxjs';
 import {ISetting} from '../../../interfaces/setting.interface';
-
-
 import {SettingService} from '../../../services/setting.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {IQuery} from '../../../interfaces/query.interface';
-import {LocationChangeListener} from "@angular/common";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicDetail} from "../../../abstracts/basic.detail";
+import {SETTING_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-setting-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
-  id: number;
-  subscription$: Subscription[];
-  settingDetail!: ISetting;
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
+export class DetailComponent extends BasicDetail implements OnInit {
 
 
-    this.subscription$.push(this.settingService.getQueryArgumentObservable().subscribe((qParams) => {
-      params = qParams;
-    }));
-
-    this.settingService.setQueryArgument(params);
-    this.router.navigate(['./admin/setting/list'], {
-      queryParams: params,
-
-    });
-  }
+  settingDetail!: ResponseObject<ISetting>;
 
   constructor(
     private settingService: SettingService,
-    private aRoute: ActivatedRoute, private router: Router) {
-    this.id = 0;
-
-    this.subscription$ = [];
-
+    private activatedRoute: ActivatedRoute,
+    protected override router: Router) {
+    super(router);
   }
 
   ngOnInit(): void {
 
-    this.subscription$.push(
-      this.aRoute.params.pipe().subscribe((params: Params) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) => this.settingService.query(+params['id'])
+      )).subscribe((setting) => {
+      this.settingDetail = setting;
+    });
 
-        this.id = +params['id'];
-
-      }));
-    this.settingService.query(this.id);
-    this.subscription$.push(
-      this.settingService.getDataObservable().subscribe((setting) => {
-        this.settingDetail = setting;
-      }));
-  }
-
-  ngOnDestroy(): void {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
-
+    this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams) => {
+      this.params = qParams;
+      this.path = SETTING_SERVICE.base;
+    });
   }
 }
 

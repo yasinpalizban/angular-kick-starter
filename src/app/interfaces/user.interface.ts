@@ -1,9 +1,6 @@
-import {IPagination} from "./pagination.interface";
 
 export interface IUser {
 
-  pager?:IPagination;
-  data?: [{
     id: number,
     email: string,
     username: string,
@@ -24,6 +21,5 @@ export interface IUser {
     phone: string,
     group: string,
     groupId?: number,
-  }];
 
 }

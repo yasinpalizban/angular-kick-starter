@@ -1,7 +1,4 @@
 export interface IProfile {
-
-
-  data?: {
     id: string,
     username: string,
     email: string,
@@ -18,5 +15,5 @@ export interface IProfile {
     createdAt: { date: Date, timezone: string, timezone_type: number },
     updatedAt: { date: Date, timezone: string, timezone_type: number },
     deletedAt: { date: Date, timezone: string, timezone_type: number },
-  };
+
 }

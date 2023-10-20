@@ -25,6 +25,7 @@ import {SocialLoginModule, SocialAuthServiceConfig} from '@abacritt/angularx-soc
 import {GoogleLoginProvider} from '@abacritt/angularx-social-login';
 import {SpinnerInterceptor} from "./interceptors/spinner.interceptor";
 
+
 // prefect scroll bar
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -50,28 +51,29 @@ export function HttpLoaderFactory(http: HttpClient) {
   declarations: [
     AppComponent
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedModule,
-    AppRoutingModule,
-    InternationalizationModule.forRoot({locale_id: 'en'}),
-    TranslateModule.forRoot({
-      defaultLanguage: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
-    PerfectScrollbarModule,
-    AdminAreaModule,
-    WebSiteModule,
-    SocialLoginModule,
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        SharedModule,
+        AppRoutingModule,
+        InternationalizationModule.forRoot({locale_id: 'en'}),
+        TranslateModule.forRoot({
+            defaultLanguage: 'en',
+            loader: {
+                provide: TranslateLoader,
+                useFactory: HttpLoaderFactory,
+                deps: [HttpClient]
+            }
+        }),
+        PerfectScrollbarModule,
+        AdminAreaModule,
+        WebSiteModule,
+        SocialLoginModule,
 
 
-  ],
+
+    ],
   providers: [
     CookieService,
     {provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true},

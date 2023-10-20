@@ -1,9 +1,13 @@
-
 <div class="table-responsive table-responsive-data2">
 
-  <div >
+  <div>
 
-    <app-user-search></app-user-search>
+    <app-searching-filed
+      [ruleSort]="this.groupRows"
+      [dataSort]="this.sortData"
+      [redirectPath]="'user'"
+      [service]="userService">
+    </app-searching-filed>
 
   </div>
   <table class="table table-data2">
@@ -48,14 +52,17 @@
       <td>
         <div class="table-data-feature">
 
-          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(user.id)" class="item" data-toggle="tooltip">
-            <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>
+          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(user.id)" class="item"
+                  data-toggle="tooltip">
+            <fa-icon [icon]="faIcon.faEdit"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(template,user.id,i)" class="item" data-toggle="tooltip">
-            <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
+          <button tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(user.id,i)" class="item"
+                  data-toggle="tooltip">
+            <fa-icon [icon]="faIcon.faTrash"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(user.id)" class="item" data-toggle="tooltip">
-            <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>
+          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(user.id)" class="item"
+                  data-toggle="tooltip">
+            <fa-icon [icon]="faIcon.faEnvelopeOpen"></fa-icon>
           </button>
 
         </div>
@@ -79,22 +86,5 @@
         (pageChanged)="onChangePaginate($event)"
         [maxSize]="sizePage"></pagination>
     </div>
-</div>
+  </div>
 
-<ng-template #template>
-  <div class="modal-header">
-    <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>  &nbsp;
-    <h4 class="modal-title pull-left">{{ 'common.remove' | translate }}</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="onModalHide()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>{{ 'common.doYouWantDelete' | translate }}? <strong class="text-danger">{{this.deleteItem}}</strong></p>
-
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="onModalHide()">{{ 'common.cancel' | translate }}</button>
-    <button type="button" class="btn btn-primary" (click)="onModalConfirm()" >{{ 'common.confirm' | translate }}</button>
-  </div>
-</ng-template>

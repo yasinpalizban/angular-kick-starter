@@ -2,19 +2,13 @@
 <div class="table-responsive table-responsive-data2">
 
   <div >
-
-<!--    <app-group-search></app-group-search>-->
+    <app-searching-filed [service]="this.groupService" [redirectPath]="'group'" [dataSort]="this.sortData" ></app-searching-filed>
 
   </div>
   <table class="table table-data2">
     <thead>
     <tr>
-      <!--      <th>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </th>-->
+
       <th>#</th>
       <th>{{ 'filed.name' | translate }}</th>
       <th>{{ 'filed.description' | translate }}</th>
@@ -23,12 +17,6 @@
     </thead>
     <tbody>
     <tr class="tr-shadow" *ngFor=" let group of this.groupRows?.data; let i= index;">
-      <!--      <td>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </td>-->
       <td>{{i + 1}}</td>
       <td>
         <span class="block-email">{{group.name}}</span>
@@ -42,15 +30,15 @@
       <td>
         <div class="table-data-feature">
 
-<!--          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(group.id)" class="item" data-toggle="tooltip">-->
-<!--            <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>-->
-<!--          </button>-->
-<!--          <button  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(template,group.id,i)" class="item" data-toggle="tooltip">-->
-<!--            <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>-->
-<!--          </button>-->
-<!--          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(group.id)" class="item" data-toggle="tooltip">-->
-<!--            <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>-->
-<!--          </button>-->
+          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(group.id)" class="item" data-toggle="tooltip">
+            <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>
+          </button>
+          <button  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(group.id,i)" class="item" data-toggle="tooltip">
+            <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
+          </button>
+          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(group.id)" class="item" data-toggle="tooltip">
+            <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>
+          </button>
 
         </div>
       </td>
@@ -74,21 +62,3 @@
         [maxSize]="sizePage"></pagination>
     </div>
 </div>
-
-<ng-template #template>
-  <div class="modal-header">
-    <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>  &nbsp;
-    <h4 class="modal-title pull-left">{{ 'common.remove' | translate }}</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="onModalHide()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>{{ 'common.doYouWantDelete' | translate }} <strong class="text-danger">{{this.deleteItem}}</strong></p>
-
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="onModalHide()">{{ 'common.cancel' | translate }}</button>
-    <button type="button" class="btn btn-primary" (click)="onModalConfirm()" >{{ 'common.confirm' | translate }}</button>
-  </div>
-</ng-template>

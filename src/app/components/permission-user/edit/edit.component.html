@@ -17,7 +17,7 @@
         class="form-control"
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let group of this.groupRows?.data; let i=index" value="{{group.name}}">{{group.name}}</option>
+        <option *ngFor="let group of this.groupRows?.data; let i=index" value="{{group.name}}">{{group.id}}</option>
 
       </select>
       <div class="input-group-addon">
@@ -32,14 +32,12 @@
     <div class="input-group">
       <div class="input-group-addon">{{ 'filed.userName' | translate }}</div>
       <select
-
         id="userId"
         name="userId"
         class="form-control"
         formControlName="userId"
         required
         [ngClass]="{ 'is-invalid': formGroup.controls?.['userId']?.invalid  && formGroup.controls?.['userId']?.touched }"
-
       >
         <option disabled  value>{{ 'common.selectInputMessage' | translate }}</option>
         <option  selected value="{{this.permissionUserDetail.data![0].userId}}">{{this.permissionUserDetail.data![0].username+' ('+this.permissionUserDetail.data![0].firstName+'  '+this.permissionUserDetail.data![0].lastName+ ')'}}</option>
@@ -65,19 +63,16 @@
     <div class="input-group">
       <div class="input-group-addon">{{ 'filed.permissionId' | translate }}</div>
       <select
-
         id="permissionId"
         name="permissionId"
         class="form-control"
         formControlName="permissionId"
         required
         [ngClass]="{ 'is-invalid': formGroup.controls?.['permissionId']?.invalid  && formGroup.controls?.['permissionId']?.touched }"
-
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
         <option *ngFor="let permission of this.permissionRows?.data; let i=index"
                 value="{{permission.id}}">{{permission.name}}</option>
-
       </select>
       <div class="input-group-addon">
         <fa-icon [icon]="faIcon.faAsterisk"></fa-icon>

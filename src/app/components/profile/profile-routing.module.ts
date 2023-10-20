@@ -1,10 +1,8 @@
 import {NgModule} from '@angular/core';
 import {Routes, RouterModule} from '@angular/router';
 import {AdminAreaComponent} from '../admin-area/admin-area.component';
-
 import {ProfileComponent} from './profile.component';
 import {AuthActivateGuard} from "../../guards/auth.activate.guard";
-import {AuthActivateChildGuard} from "../../guards/auth.activate.child.guard";
 
 
 const routes: Routes = [

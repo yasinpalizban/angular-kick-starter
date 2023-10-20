@@ -1,16 +1,17 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
-
+import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import {PermissionGroupService} from "../../../services/permission.group.service";
 import {PermissionGroup} from "../../../models/permission.group.model";
 import {IGroup} from "../../../interfaces/group.interface";
 import {GroupService} from "../../../services/group.service";
-import {Subscription} from "rxjs";
+import {takeUntil} from "rxjs";
 import {IPermission} from "../../../interfaces/permission.interface";
 import {PermissionService} from "../../../services/permission.service";
 import {PermissionType} from "../../../enums/permission.enum";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -18,21 +19,20 @@ import {PermissionType} from "../../../enums/permission.enum";
   templateUrl: './add.component.html',
   styleUrls: ['./add.component.scss']
 })
-export class AddComponent implements OnInit, OnDestroy {
+export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
-  formGroup!: FormGroup;
-  submitted: boolean;
-  groupRows!: IGroup;
-  permissionRows!: IPermission;
-  subscription: Subscription[];
+
+  groupRows!: ResponseObject<IGroup>;
+  permissionRows!: ResponseObject<IPermission>;
   actionsArray: any;
 
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
-              private  permissionService: PermissionService,
-              private permissionGroupService: PermissionGroupService) {
-    this.submitted = false;
-    this.subscription = [new Subscription()];
+              private permissionService: PermissionService,
+              private permissionGroupService: PermissionGroupService,
+              protected override router: Router
+  ) {
+    super(router);
     this.actionsArray = [
       {value: "-get", name: PermissionType.Get},
       {value: "-post", name: PermissionType.Post},
@@ -57,20 +57,15 @@ export class AddComponent implements OnInit, OnDestroy {
       actions: this.formBuilder.array([], [Validators.required])
 
     });
-    this.groupService.query();
 
-    this.subscription.push(
-      this.groupService.getDataObservable().subscribe((groups: IGroup) => {
-        this.groupRows = groups;
+    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((groups) => {
+      this.groupRows = groups;
+    })
 
-      })
-    );
-    this.permissionService.query();
-    this.subscription.push(
-      this.permissionService.getDataObservable().subscribe((permision: IPermission) => {
-        this.permissionRows = permision;
-      })
-    );
+
+    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((permision) => {
+      this.permissionRows = permision;
+    });
 
   }
 
@@ -97,8 +92,8 @@ export class AddComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnDestroy(): void {
-    this.subscription.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.permissionGroupService.unsubscribe();
   }
 

@@ -5,20 +5,19 @@ import {Auth} from '../../../models/authenticate.model';
 import {MustMatch} from '../../../utils/must-match.validator';
 import {AuthenticateService} from '../../../services/authenticate.service';
 import {FacebookLoginProvider, GoogleLoginProvider, SocialAuthService, SocialUser} from '@abacritt/angularx-social-login';
-import {Subscription} from "rxjs";
+import { takeUntil} from "rxjs";
 import {ReCaptchaV3Service} from "ng-recaptcha";
 import {faFacebookF, faInstagram, faGoogle} from '@fortawesome/free-brands-svg-icons'
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit, OnDestroy {
+export class RegisterComponent extends BasicForm implements OnInit, OnDestroy {
   icons = {faFacebookF, faGoogle, faInstagram};
-  fromGroup!: FormGroup;
-  submitted: boolean;
-  subscription: Subscription[];
   token: string;
   action: string;
   socialUser!: SocialUser;
@@ -27,17 +26,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(private formBuilder: FormBuilder,
               private authService: AuthenticateService,
               private socialAuthService: SocialAuthService,
-              private recaptchaV3Service: ReCaptchaV3Service
+              private recaptchaV3Service: ReCaptchaV3Service,
+              protected  override  router:Router
   ) {
-    this.submitted = false;
-    this.subscription = [new Subscription()];
+    super(router);
     this.token = ''
     this.action = 'importantAction';
 
   }
 
   ngOnInit(): void {
-    this.fromGroup = this.formBuilder.group({
+    this.formGroup = this.formBuilder.group({
       login: new FormControl('', [
         Validators.required,
       ]),
@@ -56,10 +55,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
 
 
-    this.subscription.push(this.recaptchaV3Service.execute(this.action)
+    this.recaptchaV3Service.execute(this.action).pipe(takeUntil(this.subscription$))
       .subscribe((token) => {
         this.token = token;
-      }));
+      });
 
 
     this.socialAuthService.authState.subscribe((user) => {
@@ -71,21 +70,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
 
-    if (this.fromGroup.invalid) {
+    if (this.formGroup.invalid) {
       return;
     }
     this.submitted = true;
     const auth = new Auth({
-      username: this.fromGroup.value.username,
-      login: this.fromGroup.value.login,
-      password: this.fromGroup.value.password,
-      passConfirm: this.fromGroup.value.passConfirm,
+      username: this.formGroup.value.username,
+      login: this.formGroup.value.login,
+      password: this.formGroup.value.password,
+      passConfirm: this.formGroup.value.passConfirm,
       socialLogin: "false",
       action: this.action,
       token: this.token
     });
     this.authService.signUp(auth);
-    this.fromGroup.reset();
+    this.formGroup.reset();
   }
 
   signInWithGoogle(): void {
@@ -111,8 +110,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.socialAuthService.refreshAuthToken(GoogleLoginProvider.PROVIDER_ID);
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.authService.unsubscribe();
-    this.subscription.forEach(sub => sub.unsubscribe());
   }
 }

@@ -1,63 +1,39 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {UserService} from '../../../services/user.service';
-
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
-
+import {switchMap, takeUntil} from 'rxjs';
 import {IQuery} from '../../../interfaces/query.interface';
 import {IUser} from '../../../interfaces/user.interface';
 import {User} from '../../../models/user.model';
-import {LocationChangeListener} from "@angular/common";
 import {IGroup} from "../../../interfaces/group.interface";
 import {GroupService} from "../../../services/group.service";
 import {faAsterisk, faEnvelope, faPhone, faUser, faUsers, faEye} from "@fortawesome/free-solid-svg-icons";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {USER_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-user-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
+export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
   faIcon = {
     faPhone,
     faUser, faAsterisk, faEnvelope, faUsers, faEye
   };
-  formGroup!: FormGroup;
-  submitted: boolean;
-  editId: number;
-  subscription$: Subscription[];
-  userDetail!: IUser;
-  groupRows!: IGroup;
 
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.userService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-    }));
-
-    this.userService.setQueryArgument(params);
-    this.router.navigate(['./admin/user/list'], {
-      queryParams: params,
-
-    });
-  }
+  userDetail!: ResponseObject<IUser>;
+  groupRows!: ResponseObject<IGroup>;
 
   constructor(private formBuilder: FormBuilder,
               private userService: UserService,
-              private aRoute: ActivatedRoute,
-              private router: Router,
+              private activatedRoute: ActivatedRoute,
+              protected override router: Router,
               private groupService: GroupService) {
-    this.submitted = false;
-    this.editId = 0;
-    this.subscription$ = [];
+    super(router);
   }
 
   ngOnInit(): void {
@@ -82,27 +58,24 @@ export class EditComponent implements OnInit, OnDestroy {
 
     });
 
-    this.groupService.query();
-    this.subscription$.push(this.groupService.getDataObservable().subscribe((groups: IGroup) => {
+    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((groups) => {
       this.groupRows = groups;
-    }));
-    this.subscription$.push(this.aRoute.params.pipe().subscribe((params: Params) => {
+    });
 
-      this.editId = +params['id'];
-
-    }));
-    this.userService.query(this.editId);
-    this.subscription$.push(this.userService.getDataObservable().subscribe((user: IUser) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) =>  this.userService.query(+params['id'])
+      )).subscribe((user) => {
       this.userDetail = user;
-      this.formGroup.controls['lastName'].setValue(user.data![0].lastName);
-      this.formGroup.controls['firstName'].setValue(user.data![0].firstName);
-      this.formGroup.controls['activate'].setValue(user.data![0].status);
-      this.formGroup.controls['groupId'].setValue(user.data![0].groupId);
+      this.formGroup.controls['lastName'].setValue(user.data.lastName);
+      this.formGroup.controls['firstName'].setValue(user.data.firstName);
+      this.formGroup.controls['activate'].setValue(user.data.status);
+      this.formGroup.controls['groupId'].setValue(user.data!.groupId);
+    });
 
-    }));
-
-
-
+    this.userService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path = USER_SERVICE.base;
+    });
   }
 
   onSubmit(): void {
@@ -118,19 +91,15 @@ export class EditComponent implements OnInit, OnDestroy {
       id: this.editId,
       firstName: this.formGroup.value.firstName,
       lastName: this.formGroup.value.lastName,
-      status: this.formGroup.value.activate==1,
+      status: this.formGroup.value.activate == 1,
       groupId: this.formGroup.value.groupId,
     });
     this.userService.clearAlert();
     this.userService.update(user);
-
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
     this.userService.unsubscribe();
+    this.unSubscription();
   }
-
-
 }

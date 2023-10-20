@@ -1,4 +1,6 @@
-export class Graph {
+import {BasicModel} from "./basic.model";
+
+export class Graph  extends BasicModel{
 
 
   public type: string  | undefined;
@@ -7,6 +9,7 @@ export class Graph {
 
 
   constructor(init?: Partial<Graph>) {
+    super();
     Object.assign(this, init);
   }
 }

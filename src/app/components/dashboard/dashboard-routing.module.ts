@@ -5,7 +5,6 @@ import {RoleType} from "../../enums/role.enum";
 import {PermissionType} from "../../enums/permission.enum";
 import {OverViewComponent} from "./over-view/over-view.component";
 import {GraphComponent} from "./graph/graph.component";
-import {DashboardComponent} from "./dashboard.component";
 import {AuthActivateChildGuard} from "../../guards/auth.activate.child.guard";
 import {AuthActivateGuard} from "../../guards/auth.activate.guard";
 
@@ -13,32 +12,32 @@ import {AuthActivateGuard} from "../../guards/auth.activate.guard";
 const routes: Routes = [
 
   {
-    path: '',
+    path: 'dashboard',
     component: AdminAreaComponent,
     canActivate: [AuthActivateGuard],
     children: [
       {
-        path: 'dashboard',
-        component: DashboardComponent,
+        path: 'graph',
+        component: GraphComponent,
         canActivate: [AuthActivateChildGuard],
         data: {
-          roles: [RoleType.Admin,RoleType.Coworker, RoleType.Blogger],
+          roles: [RoleType.Admin, RoleType.Coworker, RoleType.Blogger],
           permission: PermissionType.Get,
-          permissionName: ["overView", "graph"]
+          permissionName: "graph"
 
         },
-
-        children: [
-          {
-            path: 'graph', component: GraphComponent
-          },
-          {
-            path: 'over-view', component: OverViewComponent
-          }
-
-        ]
       },
+      {
+        path: 'over-view',
+        component: OverViewComponent,
+        canActivate: [AuthActivateChildGuard],
+        data: {
+          roles: [RoleType.Admin, RoleType.Coworker, RoleType.Blogger],
+          permission: PermissionType.Get,
+          permissionName: "overView"
 
+        },
+      },
     ]
   }
 

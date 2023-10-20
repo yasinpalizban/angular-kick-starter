@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AlertService} from './alert.service';
-
 import {environment} from '../../environments/environment';
 import {IProfile} from '../interfaces/profile.interface';
 import {Profile} from '../models/profile.model';
-import {ErrorService} from './error.service';
 import {TranslateService} from '@ngx-translate/core';
 import {ApiService} from './api.service';
 import {IApiCommonFunction} from "../interfaces/api.common.function.service.interface";
+import {Observable} from "rxjs";
+import {ResponseObject} from "../interfaces/response.object.interface";
 
 
 @Injectable({
@@ -18,21 +18,17 @@ export class ProfileService extends ApiService<IProfile> implements IApiCommonFu
 
   constructor(protected override httpClient: HttpClient,
               protected override alertService: AlertService,
-              protected override  errorService: ErrorService,
-              protected override  translate: TranslateService,
+              protected override translate: TranslateService,
   ) {
     super(httpClient,
       alertService,
-      errorService,
-      environment.baseUrl + 'profile',
       translate);
+    this.pageUrl = environment.baseUrl + 'profile';
 
   }
 
-  query(): void {
-    this.subscription.push(super.get().subscribe((profile) => {
-      this.dataSubject.next(profile);
-    }));
+  query(): Observable<ResponseObject<IProfile>> {
+    return super.get();
   }
 
 

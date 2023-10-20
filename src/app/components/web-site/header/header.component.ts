@@ -16,32 +16,16 @@ import {TranslateService} from "@ngx-translate/core";
   encapsulation: ViewEncapsulation.None
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  subscription: Subscription[];
-  faIcon = {faBars, faCalendarAlt, faAngleDown, faHome, faSignInAlt,faNewspaper};
-  buttonBars: boolean;
-  menu:{
-    home:boolean,
-    music:boolean,
-    contact:boolean,
-    blog:boolean,
-    signIn:boolean,
+  faIcon = {faBars, faCalendarAlt, faAngleDown, faHome, faSignInAlt, faNewspaper};
+  buttonBars: boolean = false;
+  menu: { home: boolean, music: boolean, contact: boolean, blog: boolean, signIn: boolean,
+  } = {signIn: false, home: false, music: false, blog: false, contact: false,}
 
-  }
-
-  constructor( private router: Router
-               ,private   homeService: HomeService,
-               private sanitizer: DomSanitizer,
-               private headerService: HeaderService,
-               private translate: TranslateService,) {
-    this.buttonBars = false;
-    this.subscription = [new Subscription()];
-    this.menu={
-      signIn:false,
-      home:false,
-      music:false,
-      blog:false,
-      contact:false,
-    }
+  constructor(private router: Router
+    , private homeService: HomeService,
+              private sanitizer: DomSanitizer,
+              private headerService: HeaderService,
+              private translate: TranslateService,) {
 
   }
 
@@ -50,7 +34,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.forEach(sub => sub.unsubscribe());
+
   }
 
   public getSantizeUrl(url: SafeUrl | string | undefined): SafeUrl | string | undefined {
@@ -67,31 +51,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   menuList(name: string) {
-    this.menu={
-      signIn:false,
-      home:false,
-      music:false,
-      blog:false,
-      contact:false,
+    this.menu = {
+      signIn: false,
+      home: false,
+      music: false,
+      blog: false,
+      contact: false,
     }
 
     switch (name) {
       case "blog":
-        this.menu.blog= true;
+        this.menu.blog = true;
         break;
       case "music":
-        this.menu.music= true;
+        this.menu.music = true;
         break;
 
       case "home":
-        this.menu.home= true;
+        this.menu.home = true;
         break;
 
       case "signIn":
-        this.menu.signIn= true;
+        this.menu.signIn = true;
         break;
       case "contact":
-        this.menu.contact= true;
+        this.menu.contact = true;
         break;
     }
   }

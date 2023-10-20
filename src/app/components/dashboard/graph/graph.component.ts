@@ -4,28 +4,25 @@ import {GraphService} from "../../../services/graph.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";
 import {AlertService} from "../../../services/alert.service";
-import {Subscription} from "rxjs";
+import {Subscription, takeUntil} from "rxjs";
 import {Graph} from "../../../models/graph.model";
 import {getDateByName} from "../../../utils/get.date.by.name";
 import {IGraph} from "../../../interfaces/graph.interface";
 import {Color} from "@swimlane/ngx-charts/lib/utils/color-sets";
 import {ScaleType} from "@swimlane/ngx-charts";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss']
 })
-export class GraphComponent implements OnInit , OnDestroy {
-  formGroup!: FormGroup;
-  submitted: boolean;
-  graphData!: IGraph;
-  subscription: Subscription[];
-
+export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
+  graphData!: ResponseObject<IGraph>;
   faIcon = {faChartArea, faList, faAsterisk, faCalendar};
   view: number[] = [600, 400];
-
-
   // options for the chart
   showXAxis = true;
   showYAxis = true;
@@ -37,30 +34,26 @@ export class GraphComponent implements OnInit , OnDestroy {
   yAxisLabel = 'Sales';
   timeline = true;
 
-
   colorScheme: Color = {
-    name:'x',
+    name: 'x',
     selectable: false,
-    group:ScaleType.Linear,
+    group: ScaleType.Linear,
     domain: ['#9370DB', '#87CEFA', '#FA8072', '#FF7F50', '#90EE90', '#9370DB']
   };
-
   //pie
   showLabels = true;
-
 
   constructor(protected graphService: GraphService,
               private formBuilder: FormBuilder,
               private translate: TranslateService,
-              private alertService: AlertService) {
-    this.subscription = [];
-    this.submitted = false;
+              private alertService: AlertService,
+              protected override router: Router) {
+    super(router);
   }
 
   ngOnInit(): void {
 
     this.formGroup = this.formBuilder.group({
-
       _type: new FormControl('', [
         Validators.required,
       ]),
@@ -68,29 +61,20 @@ export class GraphComponent implements OnInit , OnDestroy {
       fromDate: new FormControl('',),
       toDate: new FormControl(''),
 
-
     });
 
-
-    this.graphService.query();
-    this.subscription.push(this.graphService.getDataObservable().subscribe((data: IGraph) => {
+    this.graphService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
       this.graphData = data;
-
-
-    }));
+    });
 
   }
 
 
-
   onSubmit(): void {
-    if ((!this.formGroup.value.date || this.formGroup.value.date =='none') &&
+    if ((!this.formGroup.value.date || this.formGroup.value.date == 'none') &&
       !this.formGroup.value.fromDate &&
       !this.formGroup.value.toDate) {
-      this.subscription.push(this.translate.get(['error.selectDate']).subscribe(result => {
-        this.alertService.error(result['error.selectDate'], this.alertService.alertOption);
-      }));
-
+      this.alertService.error(this.translate.instant(['error.selectDate']), this.alertService.alertOption);
       return;
     }
 
@@ -104,20 +88,19 @@ export class GraphComponent implements OnInit , OnDestroy {
     this.submitted = true;
     const graph = new Graph({
       type: this.formGroup.value._type,
-      toDate: toDate.replace("\//","-"),
-      fromDate: fromDate.replace("\//","-")
+      toDate: toDate.replace("\//", "-"),
+      fromDate: fromDate.replace("\//", "-")
     });
 
-    this.graphService.save(graph);
 
-    this.subscription.push(this.graphService.getDataObservable().subscribe((data: IGraph) => {
+
+    this.graphService.save(graph).pipe(takeUntil(this.subscription$)).subscribe((data) => {
       this.graphData = data;
-    }));
+    });
   }
 
-  ngOnDestroy(): void {
-
-    this.subscription.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.graphService.unsubscribe();
   }
 

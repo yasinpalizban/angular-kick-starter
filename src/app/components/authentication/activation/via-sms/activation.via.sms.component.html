@@ -1,0 +1,54 @@
+<form novalidate (ngSubmit)="onSubmit()" [formGroup]="formGroup">
+  <div class="form-group">
+    <app-alert></app-alert>
+  </div>
+  <div class="form-group">
+    <label>{{ 'filed.code' | translate }}</label>
+    <input
+      formControlName="code"
+      required
+      [ngClass]="{ 'is-invalid': formGroup.controls?.['code']?.invalid && formGroup.controls?.['code']?.touched }"
+      class="au-input au-input--full"
+      type="number"
+      name="code"
+      placeholder="{{ 'filed.code' | translate }}">
+    <div *ngIf=" !submitted &&formGroup.controls?.['code']?.invalid ||formGroup.controls?.['code']?.touched"
+         class="invalid-feedback">
+      <div *ngIf="formGroup.controls?.['code']?.errors"
+           class="pull-right">{{ 'common.required' | translate }}</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="m-t-10">{{ 'filed.phone' | translate }}</label>
+    <input
+      formControlName="phone"
+      required
+      [ngClass]="{ 'is-invalid': formGroup.controls?.['phone']?.invalid && formGroup.controls?.['phone']?.touched }"
+      class="au-input au-input--full"
+      type="text"
+      name="phone"
+      placeholder="{{ 'filed.phone' | translate }}">
+    <div *ngIf=" !submitted && formGroup.controls?.['phone']?.invalid ||formGroup.controls?.['phone']?.touched"
+         class="invalid-feedback">
+      <div *ngIf="formGroup.controls?.['phone']?.errors"
+           class="pull-right">{{ 'common.required' | translate }}</div>
+    </div>
+  </div>
+
+  <div class="register-link ">
+
+    <button
+      class="au-btn  au-btn--green   m-r-5 m-t-15"
+      type="submit"
+      [disabled]="formGroup.invalid">{{'common.submit'|translate}}
+    </button>
+    <button
+      class="au-btn  au-btn--blue m-l-5 m-t-15"
+      type="submit"
+      (click)="onSendSms()"
+    >{{'common.sendSmsCode'|translate}}
+    </button>
+  </div>
+
+</form>

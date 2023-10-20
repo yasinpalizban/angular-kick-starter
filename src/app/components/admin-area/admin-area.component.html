@@ -1,9 +1,34 @@
-
 <div class="page-wrapper">
   <div class="page-container2">
     <app-admin-header></app-admin-header>
     <div [dir]="direction">
-      <router-outlet></router-outlet>
+      <section *ngIf="checkValidToShow('typeOne')" class="statistic">
+        <div class="section__content section__content--p30">
+          <div class="container-fluid">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+      </section>
+
+      <section *ngIf="checkValidToShow('typeTwo')" class="statistic">
+        <div class="section__content section__content--p30">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-header" style="direction: ltr">
+                    <fa-icon [icon]="faIcon.faList"></fa-icon>
+                    <strong class="card-title pl-2">  {{ title }} </strong>
+                  </div>
+                  <div class="card-body">
+                    <router-outlet></router-outlet>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
     <app-admin-footer></app-admin-footer>
   </div>

@@ -10,11 +10,12 @@ import {catchError, map} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {ErrorInterceptType} from '../enums/error.intercept.enum';
 import {environment} from "../../environments/environment";
+import {ErrorService} from "../services/error.service";
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
-  constructor(private router: Router) {
+  constructor(private router: Router,private  errorService: ErrorService) {
   }
 
 
@@ -33,22 +34,18 @@ export class ErrorInterceptor implements HttpInterceptor {
           //  this.router.navigate(['./sign-out']);
           //  this.router.navigate(['./403']);
         }
-       // else if (err.error.type && err.error.type === ErrorInterceptType.Activation) {
-          //   this.router.navigate(['./home/sign-out']);
-        //}
 
 
+        this.errorService.handleError(err);
         return throwError(err);
       }), map((event: HttpEvent<any>) => {
         if (event instanceof HttpResponse) {
        //ng serve
-
         console.log('event--->>>', event);
 
 
-
-
         }
+
         return event;
       }));
   }

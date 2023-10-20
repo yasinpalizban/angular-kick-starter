@@ -6,15 +6,15 @@ import {EditComponent} from './edit/edit.component';
 import {AddComponent} from './add/add.component';
 import {ListComponent} from './list/list.component';
 import {DetailComponent} from './detail/detail.component';
-import {SearchComponent} from './search/search.component';
+
 
 import {PermissionGroupRoutingModule} from "./permission.group-routing.module";
-import {PermissionGroupComponent} from "./permission.group.component";
+
 
 @NgModule({
   declarations: [
 
-    PermissionGroupComponent,
+
 
     EditComponent,
 
@@ -22,7 +22,6 @@ import {PermissionGroupComponent} from "./permission.group.component";
 
     ListComponent,
 
-    SearchComponent,
     DetailComponent
   ],
   imports: [

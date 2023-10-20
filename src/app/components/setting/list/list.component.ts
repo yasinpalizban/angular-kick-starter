@@ -1,12 +1,19 @@
-import {Component, HostListener, OnDestroy, OnInit, TemplateRef} from '@angular/core';
-import {Subscription} from 'rxjs';
+import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
+import {mergeMap, Subject, takeUntil} from 'rxjs';
 import {SettingService} from '../../../services/setting.service';
 import {ISetting} from '../../../interfaces/setting.interface';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
 import {IQuery} from '../../../interfaces/query.interface';
 import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicList} from "../../../abstracts/basic.list";
+import {ModalComponent} from "../../../helpers/modal/modal.component";
+
+import {isEmpty} from "../../../utils/is.empty";
+import {SETTING_SERVICE} from "../../../configs/path.constants";
+import {take} from "rxjs/operators";
 
 
 @Component({
@@ -16,140 +23,87 @@ import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons
 
 
 })
-export class ListComponent implements OnInit, OnDestroy {
+export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  subscription$: Subscription[];
-  settingRows!: ISetting;
-  totalPage: number;
-  currentPage: number;
-  sizePage: number;
-  modalRef!: BsModalRef;
-  deleteId: number;
-  deleteIndex: number;
-  deleteItem: string;
-  @HostListener('mouseenter')
-  onMouseEnter(): void {
-    if (this.currentPage !== (+this.activatedRoute.snapshot.queryParams['page'])) {
-      this.currentPage = this.activatedRoute.snapshot.queryParams['page'] ? +this.activatedRoute.snapshot.queryParams['page'] : 1;
+  settingRows!: ResponseObject<ISetting>;
 
-    }
-
-  }
-
-  constructor(private settingService: SettingService,
+  constructor(public settingService: SettingService,
               private router: Router,
+              protected override activatedRoute: ActivatedRoute,
               private modalService: BsModalService,
-              private activatedRoute: ActivatedRoute
   ) {
-
-    this.currentPage = 1;
-    this.totalPage = 1;
-    this.sizePage = 10;
-    this.deleteId = 0;
-    this.deleteIndex = 0;
-    this.deleteItem = '';
-    this.subscription$ = [];
+    super(activatedRoute)
 
   }
 
   ngOnInit(): void {
+    this.sortData = [
+      {id: 'id', text: 'Id'},
+      {id: 'key', text: 'Key '},
+      {id: 'value', text: 'Value'},
+      {id: 'status', text: 'Status'}
+    ];
 
-
-    this.subscription$.push(this.activatedRoute.queryParams.subscribe((params: Params) => {
-
-      if (Object.keys(params).length !== 0) {
-        this.settingService.query(params);
-      } else {
-        this.settingService.query();
-      }
-      this.settingService.setQueryArgument(params);
-    }));
-
-
-    this.subscription$.push(this.settingService.getDataObservable().subscribe((settings) => {
+    this.activatedRoute.queryParams.pipe(takeUntil(this.subscription$),
+      mergeMap((params) => {
+        this.settingService.setQueryArgument(params);
+        return this.settingService.query(params);
+      })).subscribe((settings) => {
       this.settingRows = settings;
-
-      if(settings.pager){
+      if (settings.pager) {
         this.totalPage = settings.pager!.total;
-        this.currentPage = settings.pager!.currentPage;
+        this.currentPage = settings.pager!.currentPage+1;
       }
-
-
-    }));
-
+    });
 
   }
 
-  ngOnDestroy(): void {
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
     this.settingService.unsubscribe();
-
+    this.unSubscription();
   }
 
 
-  onEditItem(id: number): void {
-    const params: IQuery = {
-      page: this.currentPage
-    };
+  async  onEditItem(id: number): Promise<void> {
 
-
-    this.subscription$.push(this.settingService.getQueryArgumentObservable().subscribe((qParams) => {
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
-    }));
-
-    this.settingService.setQueryArgument(params);
-    this.router.navigate(['./admin/setting/edit/' + id]);
+   await  this.router.navigate([SETTING_SERVICE.edit + id]);
   }
 
-  onDetailItem(id: number): void {
+ async onDetailItem(id: number): Promise<void> {
 
-    this.router.navigate(['./admin/setting/detail/' + id]);
+   await this.router.navigate([SETTING_SERVICE.detail + id]);
   }
 
-  onOpenModal(template: TemplateRef<string>, id: number, index: number): void {
+  onOpenModal(id: number, index: number): void {
 
-    this.modalRef = this.modalService.show(template);
+
     this.deleteId = id;
     this.deleteIndex = index;
     this.deleteItem = this.settingRows.data![index].key;
-  }
 
-  onModalHide(): void {
-    this.modalRef.hide();
+    const initialState: ModalOptions = {
+      initialState: {
+        deleteItem: this.deleteItem,
+      }
+    };
 
-  }
+    this.modalRef = this.modalService.show(ModalComponent, initialState);
+    this.modalRef.content.onClose = new Subject<boolean>();
+    this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
+      if (result) {
+        this.settingService.remove(this.deleteId);
+        this.settingRows.data!.splice(this.deleteIndex, 1);
+      }
+    });
 
-  onModalConfirm(): void {
-    this.modalRef.hide();
-
-    this.settingService.remove(this.deleteId);
-    this.settingRows.data!.splice(this.deleteIndex, 1);
   }
 
 
   onChangePaginate($event: PageChangedEvent): void {
-
-    const params: IQuery = {
-      page: $event.page,
-    };
-
-
-    this.subscription$.push(this.settingService.getQueryArgumentObservable().subscribe((qParams) => {
-
-      params.sort = qParams.sort;
-      params.order = qParams.order;
-      params.q = qParams.q;
-
-    }));
-
-    this.settingService.setQueryArgument(params);
-    this.router.navigate(['./admin/setting/list'], {
-      queryParams: params,
-
+    this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$), take(1)).subscribe((qParams: IQuery) => {
+      this.router.navigate([SETTING_SERVICE.list], {
+        queryParams: {...qParams, page: $event.page},
+      }).then();
     });
   }
-
-
 }

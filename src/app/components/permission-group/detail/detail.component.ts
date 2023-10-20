@@ -1,71 +1,49 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {Subscription} from 'rxjs';
-
-
+import {switchMap, takeUntil} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {IQuery} from '../../../interfaces/query.interface';
-
 import {LocationChangeListener} from "@angular/common";
-
 import {IPermissionGroup} from "../../../interfaces/permission.group.interface";
 import {PermissionGroupService} from "../../../services/permission.group.service";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {MainAbstract} from "../../../abstracts/main.abstract";
+import {BasicDetail} from "../../../abstracts/basic.detail";
+import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-permission-group-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss']
 })
-export class DetailComponent implements OnInit, OnDestroy {
-  id: number;
-  subscription$: Subscription[];
-  permissionGroupDetail!: IPermissionGroup;
+export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void {
+  permissionGroupDetail!: ResponseObject<IPermissionGroup>;
 
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.permissionGroupService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-
-
-    }));
-
-    this.permissionGroupService.setQueryArgument(params);
-    this.router.navigate(['./admin/group-permission/list'], {
-      queryParams: params,
-
-    });
-  }
 
   constructor(
     private permissionGroupService: PermissionGroupService,
-    private aRoute: ActivatedRoute, private router: Router) {
-    this.id = 0;
-    this.subscription$ = [];
+    private activatedRoute: ActivatedRoute, protected override router: Router) {
+    super(router);
 
   }
 
   ngOnInit(): void {
 
-    this.subscription$.push(
-      this.aRoute.params.pipe().subscribe((params: Params) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) =>   this.permissionGroupService.query(+params['id'])
+      )).subscribe((permission) => {
+      this.permissionGroupDetail = permission;
+    });
 
-        this.id = +params['id'];
-
-      }));
-    this.permissionGroupService.query(this.id);
-    this.subscription$.push(
-      this.permissionGroupService.getDataObservable().subscribe((permission: IPermissionGroup ) => {
-        this.permissionGroupDetail = permission;
-      }));
+    this.permissionGroupService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path= PERMISSION_GROUP_SERVICE.base;
+    });
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
 
-    this.subscription$.forEach(sub => sub.unsubscribe());
+    this.permissionGroupService.unsubscribe()
 
   }
 }

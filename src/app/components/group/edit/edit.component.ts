@@ -1,56 +1,32 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {GroupService} from '../../../services/group.service';
-
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
-
+import {switchMap, takeUntil} from 'rxjs';
 import {IGroup} from '../../../interfaces/group.interface';
 import {IQuery} from '../../../interfaces/query.interface';
 import {Group} from '../../../models/group.model';
-import {LocationChangeListener} from "@angular/common";
 import {faFileWord, faStickyNote} from "@fortawesome/free-solid-svg-icons";
+import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {BasicForm} from "../../../abstracts/basic.form";
+import {GROUP_SERVICE} from "../../../configs/path.constants";
 
 @Component({
   selector: 'app-group-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
-  faIcon = { faStickyNote, faFileWord};
-  formGroup!: FormGroup;
-  submitted: boolean;
-  editId: number;
-  subscription$: Subscription[];
-  settingDetail!: IGroup;
+export class EditComponent extends BasicForm implements OnInit, OnDestroy {
+  faIcon = {faStickyNote, faFileWord};
+  groupDetail!: ResponseObject<IGroup>;
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: LocationChangeListener): void  {
-
-    let params: IQuery = {};
-
-
-    this.subscription$.push(this.groupService.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-
-      params = qParams;
-    }));
-
-    this.groupService.setQueryArgument(params);
-    this.router.navigate(['./admin/group/list'], {
-      queryParams: params,
-
-    });
-  }
 
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
-              private aRoute: ActivatedRoute,
-              private router: Router) {
-    this.submitted = false;
-    this.editId = 0;
+              private activatedRoute: ActivatedRoute,
+              protected override router: Router) {
 
-
-    this.subscription$ = [];
+    super(router);
   }
 
   ngOnInit(): void {
@@ -71,45 +47,38 @@ export class EditComponent implements OnInit, OnDestroy {
     });
 
 
-    this.subscription$.push(this.aRoute.params.pipe().subscribe((params: Params) => {
+    this.activatedRoute.params.pipe(takeUntil(this.subscription$),
+      switchMap((params) => this.groupService.query(+params['id'])
+      )).subscribe((group) => {
+      this.groupDetail = group;
+      this.formGroup.controls['name'].setValue(group.data.name);
+      this.formGroup.controls['description'].setValue(group.data.description);
+    });
 
-      this.editId = +params['id'];
 
-    }));
-    this.groupService.query(this.editId);
-    this.subscription$.push(this.groupService.getDataObservable().subscribe((group: IGroup) => {
-      this.settingDetail = group;
-
-      this.formGroup.controls['name'].setValue(group.data![0].name);
-      this.formGroup.controls['description'].setValue(group.data![0].description);
-
-    }));
+    this.groupService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
+      this.params = qParams;
+      this.path = GROUP_SERVICE.base;
+    });
   }
 
-  onSubmit(): void  {
-
+  onSubmit(): void {
 
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
-
     const group = new Group({
       id: this.editId,
       name: this.formGroup.value.name.toLowerCase(),
       description: this.formGroup.value.description,
-
     });
-
     this.groupService.clearAlert();
     this.groupService.update(group);
-
   }
 
-  ngOnDestroy(): void  {
-
-    this.subscription$.forEach(sub => sub.unsubscribe());
+  override ngOnDestroy(): void {
+    this.unSubscription();
     this.groupService.unsubscribe();
   }
 
