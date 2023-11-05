@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import { switchMap, takeUntil} from 'rxjs';
-import {ISetting} from '../../../interfaces/setting.interface';
+import {ISetting} from '../../../interfaces/isetting.interface';
 import {SettingService} from '../../../services/setting.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicDetail} from "../../../abstracts/basic.detail";
 import {SETTING_SERVICE} from "../../../configs/path.constants";
 
@@ -15,7 +15,7 @@ import {SETTING_SERVICE} from "../../../configs/path.constants";
 export class DetailComponent extends BasicDetail implements OnInit {
 
 
-  settingDetail!: ResponseObject<ISetting>;
+  setting!: IResponseObject<ISetting>;
 
   constructor(
     private settingService: SettingService,
@@ -28,8 +28,8 @@ export class DetailComponent extends BasicDetail implements OnInit {
 
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
       switchMap((params) => this.settingService.query(+params['id'])
-      )).subscribe((setting) => {
-      this.settingDetail = setting;
+      )).subscribe((data) => {
+      this.setting = data;
     });
 
     this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams) => {

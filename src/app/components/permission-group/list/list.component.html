@@ -1,19 +1,13 @@
 <div class="table-responsive table-responsive-data2">
 
-  <div>
 
-    <app-searching-filed [service]="this.permissionGroupService" [redirectPath]="'permission-group'" [dataSort]="this.sortData" ></app-searching-filed>
+  <app-searching-filed [service]="this.permissionGroupService" [redirectPath]="'permission-group'"
+                       [dataSort]="this.sortData"></app-searching-filed>
 
-  </div>
+
   <table class="table table-data2">
     <thead>
     <tr>
-      <!--      <th>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </th>-->
       <th>#</th>
       <th>{{ 'filed.permissionId' | translate }}</th>
       <th>{{ 'filed.group' | translate }}</th>
@@ -22,17 +16,8 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="tr-shadow" *ngFor=" let permisionGroup of this.permissionGroupRows?.data; let i= index;">
-      <!--      <td>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </td>-->
+    <tr class="tr-shadow" *ngFor=" let permisionGroup of this.permissionGroup?.data; let i= index;">
       <td>{{i + 1}}</td>
-
-
-
       <td>
         <span class="block-email">{{permisionGroup.permission}}</span>
       </td>
@@ -45,15 +30,15 @@
       <td>
         <div class="table-data-feature">
 
-          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(permisionGroup.id)" class="item"
+          <button appActions [permissionType]="'put'" [permissionName]="'permissionGroup'"  tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(permisionGroup.id)" class="item"
                   data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faEdit"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(permisionGroup.id,i)"
+          <button appActions [permissionType]="'delete'" [permissionName]="'permissionGroup'" tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(permisionGroup.id,i)"
                   class="item" data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faTrash"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(permisionGroup.id)" class="item"
+          <button appActions [permissionType]="'get'" [permissionName]="'permissionGroup'" tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(permisionGroup.id)" class="item"
                   data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faEnvelopeOpen"></fa-icon>
           </button>
@@ -79,6 +64,6 @@
         (pageChanged)="onChangePaginate($event)"
         [maxSize]="sizePage"></pagination>
     </div>
-</div>
+  </div>
 
 

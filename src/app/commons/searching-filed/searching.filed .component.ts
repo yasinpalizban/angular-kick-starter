@@ -1,16 +1,15 @@
 import {Component, Input, OnDestroy, OnInit, TemplateRef, ViewEncapsulation} from '@angular/core';
-import {IQuery} from '../../interfaces/query.interface';
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {Select2OptionData} from 'ng-select2';
 import {Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {BsModalRef, BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {OperatorType} from '../../enums/operator.enum';
-import {HttpParams} from '@angular/common/http';
 import {CompressSearchForm} from '../../utils/compress-search-form';
-import {faAsterisk, faEllipsisH, faPlus, faSearch, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faAsterisk, faEllipsisH, faPlus, faSearch, faTrash, faTasks} from "@fortawesome/free-solid-svg-icons";
 import {convertSign} from "../../utils/convert.sign";
 import {isEmpty} from "../../utils/is.empty";
+import {IQuery} from "../../interfaces/iquery.interface";
 
 @Component({
   selector: 'app-searching-filed',
@@ -20,12 +19,20 @@ import {isEmpty} from "../../utils/is.empty";
 })
 export class SearchingFiledComponent implements OnInit, OnDestroy {
   @Input('redirectPath') redirectPath!: string;
+  @Input('listLink') listLink: Array<{ link: string, name: string }> = [];
   @Input('service') service!: any;
   @Input('dataSort') sortData!: Array<Select2OptionData>;
   @Input('ruleSort') ruleData!: Array<Select2OptionData>;
-  faIcon = {faTrash, faAsterisk, faPlus, faSearch, faEllipsisH};
+  pageData: Array<Select2OptionData> = [
+    {id: '10', text: '10'},
+    {id: '20', text: '20'},
+    {id: '50', text: '50'},
+    {id: '10', text: '100'}
+  ];
+  faIcon = {faTrash, faAsterisk, faPlus, faSearch, faEllipsisH, faTasks};
   sortValue: string = 'id';
   orderValue: string = 'desc';
+  pageValue: number = 10;
   ruleValue: string = '';
   formGroup!: FormGroup;
   submitted: boolean = false;
@@ -67,7 +74,7 @@ export class SearchingFiledComponent implements OnInit, OnDestroy {
     }
 
     this.subscription = this.service.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
-      if(!isEmpty(qParams)){
+      if (!isEmpty(qParams)) {
         this.sortValue = qParams.sort!;
         this.orderValue = qParams.order!;
       }
@@ -77,6 +84,14 @@ export class SearchingFiledComponent implements OnInit, OnDestroy {
     this.onChangeDataTable();
   }
 
+
+  onChangePaginate(): void {
+    let queryParam = 'sort=' + this.sortValue! + '&order=' + this.orderValue!+ '&limit='+this.pageValue;
+      if (this.ruleData?.length! > 0) {
+        queryParam += '&foreignKey=' + this.ruleValue!;
+      }
+      this.router.navigateByUrl('admin/' + this.redirectPath + '/list?' + queryParam).then();
+  }
 
   onChangeDataTable(): void {
     let queryParam = ''
@@ -98,7 +113,7 @@ export class SearchingFiledComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    this.service.unsubscribe();
+    this.service?.unsubscribe();
   }
 
   onOpenModal(template: TemplateRef<string>): void {
@@ -113,7 +128,7 @@ export class SearchingFiledComponent implements OnInit, OnDestroy {
   async onSubmitAdvanceSearch(): Promise<void> {
     this.subscription = this.service.getQueryArgumentObservable().subscribe((qParams: IQuery) => {
 
-      if(qParams){
+      if (qParams) {
         this.sortValue = qParams.sort!;
         this.orderValue = qParams.order!;
       }
@@ -165,5 +180,12 @@ export class SearchingFiledComponent implements OnInit, OnDestroy {
 
   get advanceSearchData(): any {
     return this.formAdvanceSearch.get('_data') as FormArray
+  }
+
+  getPermission(): string {
+    if (this.redirectPath.indexOf('-') != -1) {
+      return this.redirectPath.replace('-', '');
+    }
+    return this.redirectPath;
   }
 }

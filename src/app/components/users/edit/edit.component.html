@@ -11,7 +11,7 @@
       <div class="input-group-addon">{{ 'filed.userName' | translate }}</div>
       <input type="text"
              readonly
-             [value]="this.userDetail.data![0].username"
+             [value]="this.user.data![0].username"
              class="form-control"
       >
       <div class="input-group-addon">
@@ -26,7 +26,7 @@
       <div class="input-group-addon">{{ 'filed.email' | translate }}</div>
       <input type="text"
              readonly
-             [value]="this.userDetail.data![0].email"
+             [value]="this.user.data![0].email"
              class="form-control"
       >
       <div class="input-group-addon">
@@ -41,7 +41,7 @@
       <div class="input-group-addon">{{ 'filed.phone' | translate }}</div>
       <input type="text"
              readonly
-             [value]="this.userDetail.data![0].phone"
+             [value]="this.user.data![0].phone"
              class="form-control"
       >
       <div class="input-group-addon">
@@ -119,8 +119,8 @@
         [ngClass]="{ 'is-invalid': formGroup.controls?.['activate']?.invalid  && formGroup.controls?.['activate']?.touched }"
 
       >
-        <option [selected]="userDetail.data![0].status==true" value="1"> {{ 'filed.activate' | translate }}</option>
-        <option [selected]="userDetail.data![0].status==false" value="0">{{ 'filed.deActivate' | translate }}</option>
+        <option [selected]="user.data![0].status==true" value="1"> {{ 'filed.activate' | translate }}</option>
+        <option [selected]="user.data![0].status==false" value="0">{{ 'filed.deActivate' | translate }}</option>
       </select>
       <div class="input-group-addon">
         <fa-icon  [icon]="faIcon.faEye" ></fa-icon>
@@ -150,7 +150,7 @@
         [ngClass]="{ 'is-invalid': formGroup.controls?.['groupId']?.invalid  && formGroup.controls?.['groupId']?.touched }"
 
       >
-        <option  *ngFor="let group of this.groupRows?.data; let i=index" value="{{group.id}}">{{group.name}}</option>
+        <option *ngFor="let group of this.group?.data; let i=index" value="{{group.id}}">{{group.name}}</option>
 
       </select>
       <div class="input-group-addon">

@@ -2,16 +2,18 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AlertService} from './alert.service';
 import {environment} from '../../environments/environment';
-import {ISetting} from '../interfaces/setting.interface';
+import {ISetting} from '../interfaces/isetting.interface';
 import {Setting} from '../models/setting.model';
 import {Router} from '@angular/router';
-import {IQuery} from '../interfaces/query.interface';
+import {IQuery} from '../interfaces/iquery.interface';
 import {ApiService} from './api.service';
 import {TranslateService} from '@ngx-translate/core';
 import {IApiCommonFunction} from "../interfaces/api.common.function.service.interface";
 import {Observable} from "rxjs";
-import {ResponseObject} from "../interfaces/response.object.interface";
+import {IResponseObject} from "../interfaces/iresponse.object.interface";
 import {ToastService} from "./toast.service";
+import {SETTING_SERVICE} from "../configs/path.constants";
+import {delay} from "../utils/delay";
 
 @Injectable({
   providedIn: 'root'
@@ -26,11 +28,11 @@ export class SettingService extends ApiService<ISetting> implements IApiCommonFu
     super(httpClient,
       alertService,
       translate);
-    this.pageUrl = environment.baseUrl + 'setting';
+    this.pageUrl = environment.baseUrl + SETTING_SERVICE.base;
   }
 
 
-  query(argument?: number | string | object | null): Observable<ResponseObject<ISetting>> {
+  query(argument?: number | string | object | null): Observable<IResponseObject<ISetting>> {
     return super.get(argument);
   }
 
@@ -40,27 +42,19 @@ export class SettingService extends ApiService<ISetting> implements IApiCommonFu
     this.subscription.push(this.post(setting).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageCreate, this.alertService.alertOption);
-      setTimeout(() => {
-        this.router.navigate(['./admin/setting/list']);
-      }, 2000);
+      delay(2000).then(()=>this.router.navigate([SETTING_SERVICE.list]));
     }));
   }
 
 
-  update(setting: Setting): void {
+  update(setting: Setting,params?: IQuery): void {
 
-    let params: IQuery;
-    this.getQueryArgumentObservable().subscribe((qParam: IQuery) => {
-      params = qParam;
-    });
     this.subscription.push(this.put(setting).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageUpdate, this.alertService.alertOption);
-      setTimeout(() => {
-        this.router.navigate(['./admin/setting/list'], {
+        delay(2000).then(()=>this.router.navigate([SETTING_SERVICE.list],{
           queryParams: params
-        });
-      }, 2000);
+        }));
     }));
 
   }

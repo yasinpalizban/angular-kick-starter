@@ -1,26 +1,26 @@
 <div class="row">
   <div class="col-md-6 col-lg-3">
     <div class="statistic__item statistic__item--green text-lg-center " style="border-radius: 20px;  text-align: center;">
-      <h2 class="number" style="margin-top: 45px">{{ overViewRows?.data?.countPost?.users}}</h2>
+      <h2 class="number" style="margin-top: 45px">{{ overView?.data?.countPost?.users}}</h2>
       <span class="desc" style="color: black;">{{ 'dashboard.user' | translate }}</span>
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="statistic__item statistic__item--orange text-lg-center" style="border-radius: 20px;text-align: center;">
-      <h2 class="number" style="margin-top: 45px">{{ overViewRows?.data?.countPost?.news}}</h2>
+      <h2 class="number" style="margin-top: 45px">{{ overView?.data?.countPost?.news}}</h2>
       <span class="desc" style="color: black;">{{ 'dashboard.news' | translate }}</span>
 
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="statistic__item statistic__item--blue text-lg-center" style="border-radius: 20px;text-align: center;">
-      <h2 class="number" style="margin-top: 45px">{{ overViewRows?.data?.countPost?.contacts}}</h2>
+      <h2 class="number" style="margin-top: 45px">{{ overView?.data?.countPost?.contacts}}</h2>
       <span class="desc" style="color: black;">{{ 'dashboard.contact' | translate }}</span>
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="statistic__item statistic__item--red text-lg-center " style="border-radius: 20px;text-align: center;">
-      <h2 class="number " style="margin-top: 45px">{{ overViewRows?.data?.countPost?.visitors}}</h2>
+      <h2 class="number " style="margin-top: 45px">{{ overView?.data?.countPost?.visitors}}</h2>
       <span class="desc" style="color: black;">{{ 'dashboard.visitor' | translate }}</span>
 
     </div>
@@ -28,7 +28,7 @@
 </div>
 
 
-<div class="row" *ngIf="overViewRows?.data?.userPost!">
+<div class="row" *ngIf="overView?.data?.userPost!">
 
   <div class="col-md-12">
     <div class="card">
@@ -49,7 +49,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let data of overViewRows?.data?.user;let i=index">
+            <tr *ngFor="let data of overView?.data?.user;let i=index">
               <td>{{i + 1}}</td>
               <td>{{data.username.substr(0, 150)}}</td>
               <td>{{data.createdAt|date}}</td>

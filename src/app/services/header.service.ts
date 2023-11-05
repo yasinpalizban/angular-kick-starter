@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {INotification} from '../interfaces/notification.interface';
+import {INotification} from '../interfaces/inotification.interface';
 import {BehaviorSubject, Observable, Subject, Subscription, takeUntil} from 'rxjs';
 import {filter} from 'rxjs/operators';
 

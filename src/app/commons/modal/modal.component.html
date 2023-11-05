@@ -6,8 +6,8 @@
   </button>
 </div>
 <div class="modal-body">
-  <p>{{ 'common.doYouWantDelete' | translate }} <strong class="text-danger">{{this.deleteItem}}</strong></p>
-
+  <p>{{ 'common.doYouWantDelete' | translate }} <strong *ngIf="type=='text'" class="text-danger">{{this.deleteItem}}</strong></p>
+  <img *ngIf="type=='image'" [src]="this.deleteItem" class=" mx-auto d-block " alt="Card image cap">
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" (click)="onModalHide()">{{ 'common.cancel' | translate }}</button>

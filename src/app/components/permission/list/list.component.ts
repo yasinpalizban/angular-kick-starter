@@ -1,16 +1,16 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {mergeMap, Subject, takeUntil} from 'rxjs';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
-import {IQuery} from '../../../interfaces/query.interface';
+import {IQuery} from '../../../interfaces/iquery.interface';
 import {faEdit, faTrash, faEnvelopeOpen} from '@fortawesome/free-solid-svg-icons';
-import {IPermission} from "../../../interfaces/permission.interface";
+import {IPermission} from "../../../interfaces/ipermission.interface";
 import {PermissionService} from "../../../services/permission.service";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicList} from "../../../abstracts/basic.list";
-import {ModalComponent} from "../../../helpers/modal/modal.component";
-import {PERMISSION_SERVICE, SETTING_SERVICE} from "../../../configs/path.constants";
+import {ModalComponent} from "../../../commons/modal/modal.component";
+import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 import {take} from "rxjs/operators";
 
 
@@ -22,7 +22,7 @@ import {take} from "rxjs/operators";
 })
 export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  permissionRows!: ResponseObject<IPermission>;
+  permission!: IResponseObject<IPermission>;
 
   constructor(public permissionService: PermissionService,
               private router: Router,
@@ -43,11 +43,11 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
       mergeMap((params) => {
         this.permissionService.setQueryArgument(params);
         return this.permissionService.query(params);
-      })).subscribe((permission) => {
-      this.permissionRows = permission;
-      if (permission.pager) {
-        this.totalPage = permission.pager!.total;
-        this.currentPage = permission.pager!.currentPage + 1;
+      })).subscribe((data) => {
+      this.permission = data;
+      if (data.pager) {
+        this.totalPage = data.pager!.total;
+        this.currentPage = data.pager!.currentPage + 1;
       }
     });
 
@@ -64,7 +64,6 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
   }
 
   async onDetailItem(id: number): Promise<void> {
-
     await this.router.navigate([PERMISSION_SERVICE.detail + id]);
   }
 
@@ -72,7 +71,7 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
 
     this.deleteId = id;
     this.deleteIndex = index;
-    this.deleteItem = this.permissionRows.data![index].name;
+    this.deleteItem = this.permission.data![index].name;
     const initialState: ModalOptions = {
       initialState: {
         deleteItem: this.deleteItem,
@@ -83,22 +82,18 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
     this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
       if (result) {
         this.permissionService.remove(this.deleteId);
-        this.permissionRows.data!.splice(this.deleteIndex, 1);
+        this.permission.data!.splice(this.deleteIndex, 1);
       }
     });
 
   }
 
-
   onChangePaginate($event: PageChangedEvent): void {
-
-
     this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$), take(1)).subscribe((qParams: IQuery) => {
       this.router.navigate([PERMISSION_SERVICE.list], {
         queryParams: {...qParams, page: $event.page},
       }).then();
     });
   }
-
 
 }

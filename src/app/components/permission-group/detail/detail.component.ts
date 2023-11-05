@@ -1,12 +1,10 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {switchMap, takeUntil} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {IQuery} from '../../../interfaces/query.interface';
-import {LocationChangeListener} from "@angular/common";
-import {IPermissionGroup} from "../../../interfaces/permission.group.interface";
+import {IQuery} from '../../../interfaces/iquery.interface';
+import {IPermissionGroup} from "../../../interfaces/ipermission.group.interface";
 import {PermissionGroupService} from "../../../services/permission.group.service";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
-import {MainAbstract} from "../../../abstracts/main.abstract";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicDetail} from "../../../abstracts/basic.detail";
 import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 
@@ -17,22 +15,19 @@ import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 })
 export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
-  permissionGroupDetail!: ResponseObject<IPermissionGroup>;
-
+  permissionGroup!: IResponseObject<IPermissionGroup>;
 
   constructor(
     private permissionGroupService: PermissionGroupService,
     private activatedRoute: ActivatedRoute, protected override router: Router) {
     super(router);
-
   }
 
   ngOnInit(): void {
-
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
       switchMap((params) =>   this.permissionGroupService.query(+params['id'])
-      )).subscribe((permission) => {
-      this.permissionGroupDetail = permission;
+      )).subscribe((data) => {
+      this.permissionGroup =data;
     });
 
     this.permissionGroupService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
@@ -42,8 +37,6 @@ export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
   }
 
   override ngOnDestroy(): void {
-
     this.permissionGroupService.unsubscribe()
-
   }
 }

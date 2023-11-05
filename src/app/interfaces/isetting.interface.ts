@@ -1,5 +1,6 @@
+import {IBasic} from "./ibasic.interface";
 
-export interface ISetting {
+export interface ISetting extends  IBasic {
 
     id: number,
     key: string,

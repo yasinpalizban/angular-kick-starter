@@ -1,16 +1,16 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {faAsterisk, faCalendar, faChartArea, faList} from '@fortawesome/free-solid-svg-icons';
 import {GraphService} from "../../../services/graph.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, Validators} from "@angular/forms";
 import {TranslateService} from "@ngx-translate/core";
 import {AlertService} from "../../../services/alert.service";
-import {Subscription, takeUntil} from "rxjs";
+import { takeUntil} from "rxjs";
 import {Graph} from "../../../models/graph.model";
 import {getDateByName} from "../../../utils/get.date.by.name";
-import {IGraph} from "../../../interfaces/graph.interface";
+import {IGraph} from "../../../interfaces/igraph.interface";
 import {Color} from "@swimlane/ngx-charts/lib/utils/color-sets";
 import {ScaleType} from "@swimlane/ngx-charts";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {Router} from "@angular/router";
 
@@ -20,7 +20,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./graph.component.scss']
 })
 export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
-  graphData!: ResponseObject<IGraph>;
+  graph!: IResponseObject<IGraph>;
   faIcon = {faChartArea, faList, faAsterisk, faCalendar};
   view: number[] = [600, 400];
   // options for the chart
@@ -51,8 +51,7 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
     super(router);
   }
 
-  ngOnInit(): void {
-
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
       _type: new FormControl('', [
         Validators.required,
@@ -62,11 +61,17 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
       toDate: new FormControl(''),
 
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+    this.initData();
+  }
+
+  private initData(): void {
     this.graphService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.graphData = data;
+      this.graph = data;
     });
-
   }
 
 
@@ -92,10 +97,8 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
       fromDate: fromDate.replace("\//", "-")
     });
 
-
-
     this.graphService.save(graph).pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.graphData = data;
+      this.graph = data;
     });
   }
 

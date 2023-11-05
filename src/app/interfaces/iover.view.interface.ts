@@ -1,4 +1,4 @@
-import {IUser} from "./user.interface";
+import {IUser} from "./iuser.interface";
 
 export interface IOverView {
   user?: IUser[],

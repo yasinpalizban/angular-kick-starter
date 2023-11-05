@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
-import { takeUntil} from 'rxjs';
-import {IProfile} from '../../../interfaces/profile.interface';
+import {takeUntil} from 'rxjs';
+import {IProfile} from '../../../interfaces/iprofile.interface';
 import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -15,7 +15,7 @@ import {
   faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
 import {BasicForm} from "../../../abstracts/basic.form";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {Router} from "@angular/router";
 
 
@@ -25,15 +25,10 @@ import {Router} from "@angular/router";
   styleUrls: ['./user-info.component.scss']
 })
 export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
-  faIcon = {
-    faPhone,
-    faUser, faEnvelope, faVenusMars,
-    faStickyNote
-  };
-
-  profileDetail!: ResponseObject<IProfile>;
-  image: SafeUrl | string='assets/images/icon/default-avatar.jpg';
-  isNewImage: boolean=false;
+  faIcon = {faPhone, faUser, faEnvelope, faVenusMars, faStickyNote};
+  profile!: IResponseObject<IProfile>;
+  image: SafeUrl | string = 'assets/images/icon/default-avatar.jpg';
+  isNewImage: boolean = false;
   formData = new FormData();
 
 
@@ -55,7 +50,7 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit(): void {
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
       email: new FormControl('', [
         Validators.required,
@@ -90,31 +85,38 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
       ]),
       image: [null],
     });
+  }
 
-    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((profile) => {
-      this.profileDetail = profile;
-      this.formGroup.controls['firstName'].setValue(profile.data!.firstName);
-      this.formGroup.controls['lastName'].setValue(profile.data!.lastName);
-      this.formGroup.controls['gender'].setValue(profile.data!.gender);
-      this.formGroup.controls['phone'].setValue(profile.data!.phone);
-      this.formGroup.controls['title'].setValue(profile.data!.title);
-      this.formGroup.controls['bio'].setValue(profile.data!.bio);
-      this.formGroup.controls['email'].setValue(profile.data!.email);
-      this.formGroup.controls['username'].setValue(profile.data!.username);
+  ngOnInit(): void {
+    this.initForm();
+    this.initData();
+
+  }
+
+  private initData(): void {
+    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
+      this.profile = data;
+      this.formGroup.controls['firstName'].setValue(data.data!.firstName);
+      this.formGroup.controls['lastName'].setValue(data.data!.lastName);
+      this.formGroup.controls['gender'].setValue(data.data!.gender);
+      this.formGroup.controls['phone'].setValue(data.data!.phone);
+      this.formGroup.controls['title'].setValue(data.data!.title);
+      this.formGroup.controls['bio'].setValue(data.data!.bio);
+      this.formGroup.controls['email'].setValue(data.data!.email);
+      this.formGroup.controls['username'].setValue(data.data!.username);
 
       this.formGroup.controls['username'].disable();
-      if (profile?.data!.phone) {
+      if (data?.data!.phone) {
         this.formGroup.controls['phone'].disable();
       }
-      if (profile?.data!.email) {
+      if (data?.data!.email) {
         this.formGroup.controls['email'].disable();
       }
-      if (profile.data!.image != null) {
-        this.image = profile.data!.image;
+      if (data.data!.image != null) {
+        this.image = data.data!.image;
       }
 
     });
-
 
   }
 

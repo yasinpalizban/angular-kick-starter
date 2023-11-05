@@ -1,14 +1,13 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IQuery} from '../../../interfaces/query.interface';
-import {LocationChangeListener} from "@angular/common";
+import {IQuery} from '../../../interfaces/iquery.interface';
 import {faFileWord, faStickyNote, faEye} from "@fortawesome/free-solid-svg-icons";
-import {IPermission} from "../../../interfaces/permission.interface";
+import {IPermission} from "../../../interfaces/ipermission.interface";
 import {PermissionService} from "../../../services/permission.service";
 import {Permission} from "../../../models/permission.model";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 
@@ -19,8 +18,7 @@ import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 })
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faStickyNote, faFileWord, faEye};
-  permissionDetail!: ResponseObject<IPermission>;
-
+  permission!: IResponseObject<IPermission>;
 
   constructor(private formBuilder: FormBuilder,
               private permissionService: PermissionService,
@@ -29,12 +27,9 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     super(router);
   }
 
-  ngOnInit(): void {
-
+  private initForm(): void {
 
     this.formGroup = this.formBuilder.group({
-
-
       name: new FormControl('', [
         Validators.required,
         Validators.maxLength(255)
@@ -46,16 +41,22 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       active: new FormControl('', [
         Validators.required,
       ]),
-
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+    this.initData();
+  }
+
+  private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
       switchMap((params) => this.permissionService.query(+params['id'])
-      )).subscribe((permission) => {
-      this.permissionDetail = permission;
-      this.formGroup.controls['name'].setValue(permission.data.name);
-      this.formGroup.controls['description'].setValue(permission.data.description);
-      this.formGroup.controls['active'].setValue(permission.data.active);
+      )).subscribe((data) => {
+      this.permission = data;
+      this.formGroup.controls['name'].setValue(data.data.name);
+      this.formGroup.controls['description'].setValue(data.data.description);
+      this.formGroup.controls['active'].setValue(data.data.active);
     });
 
     this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
@@ -65,7 +66,6 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-
     if (this.formGroup.invalid) {
       return;
     }
@@ -76,10 +76,8 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       description: this.formGroup.value.description,
       active: this.formGroup.value.active == 1,
     });
-
     this.permissionService.clearAlert();
-    this.permissionService.update(permission);
-
+    this.permissionService.update(permission, this.params);
   }
 
   override ngOnDestroy(): void {

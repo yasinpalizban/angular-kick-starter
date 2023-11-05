@@ -1,17 +1,15 @@
-import {Component, OnDestroy, OnInit, TemplateRef} from '@angular/core';
+import {Component, OnDestroy, OnInit } from '@angular/core';
 import {mergeMap, Subject, takeUntil} from 'rxjs';
 import {SettingService} from '../../../services/setting.service';
-import {ISetting} from '../../../interfaces/setting.interface';
+import {ISetting} from '../../../interfaces/isetting.interface';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
-import {IQuery} from '../../../interfaces/query.interface';
+import {IQuery} from '../../../interfaces/iquery.interface';
 import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicList} from "../../../abstracts/basic.list";
-import {ModalComponent} from "../../../helpers/modal/modal.component";
-
-import {isEmpty} from "../../../utils/is.empty";
+import {ModalComponent} from "../../../commons/modal/modal.component";
 import {SETTING_SERVICE} from "../../../configs/path.constants";
 import {take} from "rxjs/operators";
 
@@ -25,7 +23,7 @@ import {take} from "rxjs/operators";
 })
 export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  settingRows!: ResponseObject<ISetting>;
+  setting!: IResponseObject<ISetting>;
 
   constructor(public settingService: SettingService,
               private router: Router,
@@ -48,11 +46,11 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
       mergeMap((params) => {
         this.settingService.setQueryArgument(params);
         return this.settingService.query(params);
-      })).subscribe((settings) => {
-      this.settingRows = settings;
-      if (settings.pager) {
-        this.totalPage = settings.pager!.total;
-        this.currentPage = settings.pager!.currentPage+1;
+      })).subscribe((data) => {
+      this.setting = data;
+      if (data.pager) {
+        this.totalPage = data.pager!.total;
+        this.currentPage = data.pager!.currentPage+1;
       }
     });
 
@@ -76,10 +74,9 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
 
   onOpenModal(id: number, index: number): void {
 
-
     this.deleteId = id;
     this.deleteIndex = index;
-    this.deleteItem = this.settingRows.data![index].key;
+    this.deleteItem = this.setting.data![index].key;
 
     const initialState: ModalOptions = {
       initialState: {
@@ -92,7 +89,7 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
     this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
       if (result) {
         this.settingService.remove(this.deleteId);
-        this.settingRows.data!.splice(this.deleteIndex, 1);
+        this.setting.data!.splice(this.deleteIndex, 1);
       }
     });
 

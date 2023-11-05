@@ -70,8 +70,8 @@
         [ngClass]="{ 'is-invalid': formGroup.controls?.['active']?.invalid  && formGroup.controls?.['active']?.touched }"
 
       >
-        <option  [selected]="permissionDetail.data![0].active==true"  value="true">{{ 'filed.activate' | translate }}</option>
-        <option  [selected]="permissionDetail.data![0].active==false" value="false">{{ 'filed.deActivate' | translate }}</option>
+        <option [selected]="permission.data![0].active==true" value="true">{{ 'filed.activate' | translate }}</option>
+        <option [selected]="permission.data![0].active==false" value="false">{{ 'filed.deActivate' | translate }}</option>
       </select>
       <div class="input-group-addon">
         <fa-icon  [icon]="faIcon.faEye" ></fa-icon>

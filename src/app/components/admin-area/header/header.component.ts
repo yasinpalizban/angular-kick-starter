@@ -4,7 +4,7 @@ import {Subscription, takeUntil} from 'rxjs';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ProfileService} from '../../../services/profile.service';
 import {environment} from '../../../../environments/environment';
-import {INotification} from '../../../interfaces/notification.interface';
+import {INotification} from '../../../interfaces/inotification.interface';
 import {HeaderService} from '../../../services/header.service';
 import {NotificationType} from '../../../enums/notification.enum';
 import {TranslateService} from '@ngx-translate/core';
@@ -17,7 +17,7 @@ import {
   faGlobe, faLanguage, faSignOutAlt, faFile, faUserCog, faEye, faRandom, faRetweet, faShoppingBag,
   faShoppingBasket, faListAlt, faTable, faSearch, faFileAudio
 } from "@fortawesome/free-solid-svg-icons";
-import {IAuth} from "../../../interfaces/authenticate.interface";
+import {IAuth} from "../../../interfaces/iauthenticate.interface";
 import {MainAbstract} from "../../../abstracts/main.abstract";
 
 @Component({

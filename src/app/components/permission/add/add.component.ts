@@ -17,14 +17,11 @@ export class AddComponent extends BasicForm implements OnInit , OnDestroy{
               private permissionService: PermissionService
               ,protected  override router:Router ) {
  super(router);
-
   }
 
   ngOnInit(): void {
 
-
     this.formGroup = this.formBuilder.group({
-
       name: new FormControl('', [
         Validators.required,
         Validators.maxLength(255)
@@ -37,17 +34,13 @@ export class AddComponent extends BasicForm implements OnInit , OnDestroy{
         Validators.required,
       ]),
     });
-
-
   }
 
   onSubmit(): void  {
 
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
     const permission = new Permission({
       name: this.formGroup.value.name.toLowerCase(),
@@ -55,14 +48,12 @@ export class AddComponent extends BasicForm implements OnInit , OnDestroy{
       active: this.formGroup.value.active == true,
 
     });
-
     this.permissionService.clearAlert();
     this.permissionService.save(permission);
 
   }
 
   override ngOnDestroy(): void  {
-
     this.permissionService.unsubscribe();
   }
 

@@ -218,7 +218,7 @@
         <ngx-charts-bar-vertical
           [view]="[600, 400]"
           [scheme]="colorScheme"
-          [results]="graphData.data!"
+          [results]="graph.data!"
           [gradient]="gradient"
           [xAxis]="showXAxis"
           [yAxis]="showYAxis"
@@ -243,7 +243,7 @@
         <!-- DATA TABLE-->
 
         <ngx-charts-pie-chart
-          [results]="graphData.data!"
+          [results]="graph.data!"
           [legend]="true"
           [legendTitle]="'Product Sale Report'"
           [view]="[600,400]"
@@ -262,7 +262,7 @@
         <!-- DATA TABLE-->
 
         <ngx-charts-pie-grid
-          [results]="graphData.data!">
+          [results]="graph.data!">
         </ngx-charts-pie-grid>
       </div>
     </div>

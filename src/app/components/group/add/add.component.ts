@@ -15,20 +15,14 @@ import {Router} from "@angular/router";
 export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faStickyNote, faFileWord};
 
-
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
               protected  override  router: Router) {
     super(router);
-
-
   }
 
   ngOnInit(): void {
-
-
     this.formGroup = this.formBuilder.group({
-
       name: new FormControl('', [
         Validators.required,
         Validators.maxLength(255)
@@ -39,12 +33,9 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
       ])
     });
 
-
   }
 
   onSubmit(): void {
-
-
     if (this.formGroup.invalid) {
       return;
     }
@@ -55,14 +46,11 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
       description: this.formGroup.value.description,
 
     });
-
     this.groupService.clearAlert();
     this.groupService.save(group);
-
   }
 
   override ngOnDestroy(): void {
-
     this.groupService.unsubscribe();
   }
 

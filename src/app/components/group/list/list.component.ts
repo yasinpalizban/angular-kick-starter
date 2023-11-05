@@ -1,16 +1,16 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {mergeMap, Subject, takeUntil} from 'rxjs';
 import {GroupService} from '../../../services/group.service';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
-import {IQuery} from '../../../interfaces/query.interface';
-import {IGroup} from '../../../interfaces/group.interface';
+import {IQuery} from '../../../interfaces/iquery.interface';
+import {IGroup} from '../../../interfaces/igroup.interface';
 import {faEdit, faTrash, faEnvelopeOpen} from '@fortawesome/free-solid-svg-icons';
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicList} from "../../../abstracts/basic.list";
-import {ModalComponent} from "../../../helpers/modal/modal.component";
-import {GROUP_SERVICE, SETTING_SERVICE} from "../../../configs/path.constants";
+import {ModalComponent} from "../../../commons/modal/modal.component";
+import {GROUP_SERVICE} from "../../../configs/path.constants";
 import {take} from "rxjs/operators";
 
 
@@ -22,8 +22,7 @@ import {take} from "rxjs/operators";
 })
 export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  groupRows!: ResponseObject<IGroup>;
-
+  group!: IResponseObject<IGroup>;
 
   constructor(public groupService: GroupService,
               private router: Router,
@@ -39,16 +38,13 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
       mergeMap((params) => {
         this.groupService.setQueryArgument(params);
         return this.groupService.query(params);
-      })).subscribe((groups) => {
-      this.groupRows = groups;
-      if (groups.pager) {
-        this.totalPage = groups.pager!.total;
-        this.currentPage = groups.pager!.currentPage+1;
+      })).subscribe((data) => {
+      this.group = data;
+      if (data.pager) {
+        this.totalPage = data.pager!.total;
+        this.currentPage = data.pager!.currentPage+1;
       }
     });
-
-
-
   }
 
   override ngOnDestroy(): void {
@@ -56,14 +52,11 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
     this.unSubscription();
   }
 
-
  async onEditItem(id: number): Promise<void> {
-
     await this.router.navigate([GROUP_SERVICE.edit + id]);
   }
 
  async onDetailItem(id: number): Promise<void> {
-
   await  this.router.navigate([GROUP_SERVICE.detail + id]);
   }
 
@@ -71,7 +64,7 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
 
     this.deleteId = id;
     this.deleteIndex = index;
-    this.deleteItem = this.groupRows.data![index].name;
+    this.deleteItem = this.group.data![index].name;
     const initialState: ModalOptions = {
       initialState: {
         deleteItem: this.deleteItem,
@@ -82,11 +75,9 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
     this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
       if (result) {
         this.groupService.remove(this.deleteId);
-        this.groupRows.data!.splice(this.deleteIndex, 1);
+        this.group.data!.splice(this.deleteIndex, 1);
       }
     });
-
-
   }
 
 
@@ -97,6 +88,4 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
       }).then();
     });
   }
-
-
 }

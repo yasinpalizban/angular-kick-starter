@@ -1,5 +1,6 @@
-export interface IProfile {
-    id: string,
+import {IBasic} from "./ibasic.interface";
+
+export interface IProfile extends  IBasic {
     username: string,
     email: string,
     firstName: string,

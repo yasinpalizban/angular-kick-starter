@@ -1,7 +1,6 @@
+import {IBasic} from "./ibasic.interface";
 
-export interface IUser {
-
-    id: number,
+export interface IUser extends  IBasic{
     email: string,
     username: string,
     status_message: string,

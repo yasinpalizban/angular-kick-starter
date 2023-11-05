@@ -22,14 +22,14 @@ export const PERMISSION_SERVICE = {
 }
 
 export const PERMISSION_USER_SERVICE = {
-  base: 'permission-user',
+  base: 'permissionUser',
   add: './admin/permission-user/add',
   list: './admin/permission-user/list',
   edit: './admin/permission-user/edit/',
   detail: './admin/permission-user/detail/',
 }
 export const PERMISSION_GROUP_SERVICE = {
-  base: 'permission-group',
+  base: 'permissionGroup',
   add: './admin/permission-group/add',
   list: './admin/permission-group/list',
   edit: './admin/permission-group/edit/',
@@ -41,4 +41,22 @@ export const SETTING_SERVICE = {
   list: './admin/setting/list',
   edit: './admin/setting/edit/',
   detail: './admin/setting/detail/',
+}
+
+export const PROFILE_SERVICE = {
+  base: 'profile'
+}
+export const OVERVIEW_SERVICE = {
+  base: 'overView'
+}
+export const GRAPH_SERVICE = {
+  base: 'graph'
+}
+
+export const HOME_SERVICE = {
+  base: 'home'
+}
+
+export const AUTH_SERVICE = {
+  base: 'auth'
 }

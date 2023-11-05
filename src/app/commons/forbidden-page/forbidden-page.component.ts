@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {RoleType} from "../../enums/role.enum";
 import {AuthenticateCheckerService} from "../../services/authenticate.checker.service";
-import {IAuth} from "../../interfaces/authenticate.interface";
+import {IAuth} from "../../interfaces/iauthenticate.interface";
 import {Subscription} from "rxjs";
 
 @Component({
@@ -18,18 +18,10 @@ export class ForbiddenPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const user: IAuth = this.authService.authChange.value;
-
-    // let pathRedirect = './admin/dashboard/over-view';
-    // if (user.role?.name == RoleType.Member) {
-    //   pathRedirect = './admin/profile';
-    // }
-
-     const pathRedirect = './admin/profile';
 
     setTimeout(() => {
-      this.router.navigate([pathRedirect],);
-    }, 2000);
+      this.router.navigate(['./admin/profile'],);
+    }, 5000);
   }
 
 }

@@ -1,4 +1,3 @@
-import {Contact} from "../models/contact.model";
 
 export interface XCookieServiceInterface {
 

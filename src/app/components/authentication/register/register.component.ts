@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-
 import {Auth} from '../../../models/authenticate.model';
 import {MustMatch} from '../../../utils/must-match.validator';
 import {AuthenticateService} from '../../../services/authenticate.service';

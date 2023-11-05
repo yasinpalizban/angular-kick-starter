@@ -1,15 +1,12 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormBuilder, FormControl,  Validators} from '@angular/forms';
 import {SettingService} from '../../../services/setting.service';
 import {Setting} from '../../../models/setting.model';
-import {ActivatedRoute, Params, Router} from '@angular/router';
-import {Subscription, switchMap, takeUntil} from 'rxjs';
-
-import {ISetting} from '../../../interfaces/setting.interface';
-import {IQuery} from '../../../interfaces/query.interface';
-import {LocationChangeListener} from "@angular/common";
+import {ActivatedRoute,  Router} from '@angular/router';
+import { switchMap, takeUntil} from 'rxjs';
+import {ISetting} from '../../../interfaces/isetting.interface';
 import {faAddressBook, faEye, faFileWord} from "@fortawesome/free-solid-svg-icons";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {SETTING_SERVICE} from "../../../configs/path.constants";
 
@@ -23,7 +20,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {
     faEye, faFileWord, faAddressBook
   };
-  settingDetail!: ResponseObject<ISetting>;
+  setting!: IResponseObject<ISetting>;
 
   constructor(private formBuilder: FormBuilder,
               private settingService: SettingService,
@@ -32,7 +29,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     super(router);
   }
 
-  ngOnInit(): void {
+  private initForm(): void {
 
 
     this.formGroup = this.formBuilder.group({
@@ -51,15 +48,24 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       ]),
     });
 
+  }
 
+  ngOnInit(): void {
+
+    this.initForm();
+    this.initData();
+
+  }
+
+  private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
       switchMap((params) => this.settingService.query(+params['id'])
-      )).subscribe((setting) => {
-      this.settingDetail = setting;
-      this.formGroup.controls['_key'].setValue(setting.data.key);
-      this.formGroup.controls['_value'].setValue(setting.data.value);
-      this.formGroup.controls['description'].setValue(setting.data.description);
-      this.formGroup.controls['status'].setValue(+setting.data.status);
+      )).subscribe((data) => {
+      this.setting = data;
+      this.formGroup.controls['_key'].setValue(data.data.key);
+      this.formGroup.controls['_value'].setValue(data.data.value);
+      this.formGroup.controls['description'].setValue(data.data.description);
+      this.formGroup.controls['status'].setValue(+data.data.status);
     });
 
     this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams) => {
@@ -84,7 +90,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       status: this.formGroup.value.status == 1,
     });
     this.settingService.clearAlert();
-    this.settingService.update(setting);
+    this.settingService.update(setting, this.params);
 
   }
 

@@ -3,11 +3,11 @@ import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {GroupService} from '../../../services/group.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IGroup} from '../../../interfaces/group.interface';
-import {IQuery} from '../../../interfaces/query.interface';
+import {IGroup} from '../../../interfaces/igroup.interface';
+import {IQuery} from '../../../interfaces/iquery.interface';
 import {Group} from '../../../models/group.model';
 import {faFileWord, faStickyNote} from "@fortawesome/free-solid-svg-icons";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {GROUP_SERVICE} from "../../../configs/path.constants";
 
@@ -18,23 +18,17 @@ import {GROUP_SERVICE} from "../../../configs/path.constants";
 })
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faStickyNote, faFileWord};
-  groupDetail!: ResponseObject<IGroup>;
-
+  group!: IResponseObject<IGroup>;
 
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
               private activatedRoute: ActivatedRoute,
               protected override router: Router) {
-
     super(router);
   }
 
-  ngOnInit(): void {
-
-
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
-
-
       name: new FormControl('', [
         Validators.required,
         Validators.maxLength(255)
@@ -43,16 +37,21 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(255)
       ]),
-
     });
+  }
 
+  ngOnInit(): void {
+    this.initForm();
+    this.initData();
+  }
 
+  private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
       switchMap((params) => this.groupService.query(+params['id'])
-      )).subscribe((group) => {
-      this.groupDetail = group;
-      this.formGroup.controls['name'].setValue(group.data.name);
-      this.formGroup.controls['description'].setValue(group.data.description);
+      )).subscribe((data) => {
+      this.group = data;
+      this.formGroup.controls['name'].setValue(data.data.name);
+      this.formGroup.controls['description'].setValue(data.data.description);
     });
 
 
@@ -74,7 +73,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       description: this.formGroup.value.description,
     });
     this.groupService.clearAlert();
-    this.groupService.update(group);
+    this.groupService.update(group, this.params);
   }
 
   override ngOnDestroy(): void {

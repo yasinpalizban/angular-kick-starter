@@ -1,7 +1,7 @@
+import {IBasic} from "./ibasic.interface";
 
-export interface IPermissionGroup {
+export interface IPermissionGroup extends  IBasic {
 
-    id: number,
     permissionId: number,
     groupId: number,
     actions: string,

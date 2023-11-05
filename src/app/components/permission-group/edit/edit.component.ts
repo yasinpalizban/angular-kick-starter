@@ -1,18 +1,17 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IQuery} from '../../../interfaces/query.interface';
-import {LocationChangeListener} from "@angular/common";
+import {IQuery} from '../../../interfaces/iquery.interface';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
-import {IPermissionGroup} from "../../../interfaces/permission.group.interface";
+import {IPermissionGroup} from "../../../interfaces/ipermission.group.interface";
 import {PermissionGroupService} from "../../../services/permission.group.service";
 import {PermissionGroup} from "../../../models/permission.group.model";
-import {IGroup} from "../../../interfaces/group.interface";
-import {IPermission} from "../../../interfaces/permission.interface";
+import {IGroup} from "../../../interfaces/igroup.interface";
+import {IPermission} from "../../../interfaces/ipermission.interface";
 import {GroupService} from "../../../services/group.service";
 import {PermissionService} from "../../../services/permission.service";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 
@@ -24,15 +23,14 @@ import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
 
-  permissionGroupDetail!: ResponseObject<IPermissionGroup>;
-  groupRows!: ResponseObject<IGroup>;
-  permissionRows!: ResponseObject<IPermission>;
-
-  isGet: boolean;
-  isPut: boolean;
-  isPost: boolean;
-  isDelete: boolean;
-  isCheck: boolean;
+  permissionGroup!: IResponseObject<IPermissionGroup>;
+  group!: IResponseObject<IGroup>;
+  permission!: IResponseObject<IPermission>;
+  isGet: boolean = false;
+  isPut: boolean = false;
+  isPost: boolean = false;
+  isDelete: boolean = false;
+  isCheck: boolean = false;
 
 
   constructor(private formBuilder: FormBuilder,
@@ -42,21 +40,11 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
               private groupService: GroupService,
               private permissionService: PermissionService,
   ) {
-
     super(router);
-    this.isDelete = false;
-    this.isGet = false;
-    this.isPost = false;
-    this.isPut = false;
-    this.isCheck = false;
-
-
   }
 
-  ngOnInit(): void {
-
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
-
       permissionId: new FormControl('', [
         Validators.required,
         Validators.maxLength(255)
@@ -66,25 +54,31 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
         Validators.maxLength(255)
       ]),
       actions: this.formBuilder.array([], [])
-
     });
+  }
 
-    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((groups) => {
-      this.groupRows = groups;
+  ngOnInit(): void {
+    this.initData();
+    this.initForm();
+  }
+
+  private initData(): void {
+    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
+      this.group = data;
     });
-    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((permision) => {
-      this.permissionRows = permision;
+    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
+      this.permission = data;
     });
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) =>   this.permissionGroupService.query(+params['id'])
-      )).subscribe((permission) => {
-      this.permissionGroupDetail = permission;
-      this.formGroup.controls['groupId'].setValue(permission.data.groupId);
-      this.formGroup.controls['permissionId'].setValue(permission.data.permissionId);
+      switchMap((params) => this.permissionGroupService.query(+params['id'])
+      )).subscribe((data) => {
+      this.permissionGroup = data;
+      this.formGroup.controls['groupId'].setValue(data.data.groupId);
+      this.formGroup.controls['permissionId'].setValue(data.data.permissionId);
     });
 
 
-    this.permissionGroupDetail.data.actions.split("-").forEach((value: string) => {
+    this.permissionGroup.data.actions.split("-").forEach((value: string) => {
       if (value === "get")
         this.isGet = true;
       else if (value === "post")
@@ -97,7 +91,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
     this.permissionGroupService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
       this.params = qParams;
-      this.path= PERMISSION_GROUP_SERVICE.base;
+      this.path = PERMISSION_GROUP_SERVICE.base;
     });
   }
 
@@ -120,7 +114,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
     });
     this.permissionGroupService.clearAlert();
-    this.permissionGroupService.update(permissionGroup);
+    this.permissionGroupService.update(permissionGroup, this.params);
   }
 
   override ngOnDestroy(): void {
@@ -132,7 +126,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     if (!this.isCheck) {
       this.isCheck = true;
-      const actBox = this.permissionGroupDetail.data.actions.split("-");
+      const actBox = this.permissionGroup.data.actions.split("-");
       actBox.forEach((value: string) => {
         if (value)
           actions.push(new FormControl("-" + value));

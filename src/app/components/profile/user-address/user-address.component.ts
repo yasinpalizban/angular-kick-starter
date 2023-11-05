@@ -1,12 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
-import { takeUntil} from 'rxjs';
-import {IProfile} from '../../../interfaces/profile.interface';
+import {takeUntil} from 'rxjs';
+import {IProfile} from '../../../interfaces/iprofile.interface';
 import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
-import {faMapMarker,faAddressBook, faMap} from "@fortawesome/free-solid-svg-icons";
+import {faMapMarker, faAddressBook, faMap} from "@fortawesome/free-solid-svg-icons";
 import {BasicForm} from "../../../abstracts/basic.form";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {Router} from "@angular/router";
 
 @Component({
@@ -14,22 +14,21 @@ import {Router} from "@angular/router";
   templateUrl: './user-address.component.html',
   styleUrls: ['./user-address.component.scss']
 })
-export class UserAddressComponent extends  BasicForm implements OnInit, OnDestroy {
+export class UserAddressComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {
-    faMap, faMapMarker,faAddressBook
+    faMap, faMapMarker, faAddressBook
   };
 
 
-
-  profileDetail!: ResponseObject<IProfile>;
+  profile!: IResponseObject<IProfile>;
 
   constructor(private formBuilder: FormBuilder,
-              private profileService: ProfileService ,
+              private profileService: ProfileService,
               protected override router: Router) {
-  super(router);
+    super(router);
   }
 
-  ngOnInit(): void {
+  private initForm(): void {
     this.formGroup = this.formBuilder.group({
 
       country: new FormControl('', [
@@ -45,15 +44,21 @@ export class UserAddressComponent extends  BasicForm implements OnInit, OnDestro
         Validators.maxLength(255)
       ])
     });
+  }
 
+  ngOnInit(): void {
 
-     this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((profile) => {
-      this.profileDetail = profile;
-      this.formGroup.controls['country'].setValue(profile.data!.country);
-      this.formGroup.controls['city'].setValue(profile.data!.city);
-      this.formGroup.controls['address'].setValue(profile.data!.address);
+    this.initForm();
+    this.initData();
+  }
+
+  private initData(): void {
+    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
+      this.profile = data;
+      this.formGroup.controls['country'].setValue(data.data!.country);
+      this.formGroup.controls['city'].setValue(data.data!.city);
+      this.formGroup.controls['address'].setValue(data.data!.address);
     });
-
 
   }
 

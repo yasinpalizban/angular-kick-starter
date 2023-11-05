@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {IAuth} from '../interfaces/authenticate.interface';
+import {HttpClient} from '@angular/common/http';
+import {IAuth} from '../interfaces/iauthenticate.interface';
 import {Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -11,6 +11,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {ApiService} from './api.service';
 import {AuthenticateServiceInterface} from "../interfaces/authenticate.service.interface";
 import {RoleType} from "../enums/role.enum";
+import {AUTH_SERVICE} from "../configs/path.constants";
+import {delay} from "../utils/delay";
 
 
 @Injectable({
@@ -25,6 +27,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   private messageReset!: string;
   private messageSendSms!: string;
   private messageSendEmail!: string;
+
   constructor(protected override httpClient: HttpClient,
               protected override alertService: AlertService,
               protected override translate: TranslateService,
@@ -33,20 +36,17 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
     super(httpClient,
       alertService,
       translate);
-    this.pageUrl = environment.baseUrl + 'auth';
+    this.pageUrl = environment.baseUrl + AUTH_SERVICE.base;
     this.messageRegister = this.translate.instant(['auth.messageRegister']);
-    this.messageRegister=this.translate.instant(['auth.messageRegister'])
-    this.messageActivate=this.translate.instant(['auth.messageActivate']);
-    this.messageForgot= this.translate.instant(['auth.messageForgot']);
-    this.messageReset=this.translate.instant(['auth.messageReset']);
-    this.messageSendSms=this.translate.instant(['auth.messageSendSms']);
-    this.messageSendEmail=this.translate.instant(['auth.messageSendEmail']);
-
-
+    this.messageRegister = this.translate.instant(['auth.messageRegister'])
+    this.messageActivate = this.translate.instant(['auth.messageActivate']);
+    this.messageForgot = this.translate.instant(['auth.messageForgot']);
+    this.messageReset = this.translate.instant(['auth.messageReset']);
+    this.messageSendSms = this.translate.instant(['auth.messageSendSms']);
+    this.messageSendEmail = this.translate.instant(['auth.messageSendEmail']);
   }
 
   signIn(auth: Auth): void {
-
     this.pageUrl = environment.baseUrl + 'auth/signin';
     this.subscription.push(this.post(auth).pipe(tap((auth) => {
       this.authChange.next(auth.data);
@@ -68,9 +68,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
 
   }
 
-
   signOut(): void {
-
     this.pageUrl = environment.baseUrl + 'auth/signout';
     this.subscription.push(this.post({}).subscribe());
     this.authChange.next({});
@@ -90,44 +88,30 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
 
     this.pageUrl = environment.baseUrl + 'auth/is-signin';
     const user: IAuth = JSON.parse(localStorage.getItem('user')!);
-
-    if (user != null && !(user.jwt?.expire! < Math.floor(new Date().getTime() / 1000)))
-      this.subscription.push(this.get().subscribe((data) => {
-
-        if (data.success == true) {
-          let address: string = window.location.origin;
-          let extendPath: string = '/admin/dashboard/over-view';
-          if (user.role?.name == 'member') {
-            extendPath = '/admin/profile';
-          }
-
-          if (address.search('www') !== -1) {
-            window.location.replace(environment.siteAddress.two + extendPath);
-          } else {
-            window.location.replace(environment.siteAddress.one + extendPath);
-          }
-
-        }
-
-      }));
-
+    if (user != null && !(user.jwt?.expire! < Math.floor(new Date().getTime() / 1000))) {
+      let address: string = window.location.origin;
+      let extendPath: string = '/admin/dashboard/over-view';
+      if (user.role?.name == 'member') {
+        extendPath = '/admin/profile';
+      }
+      if (address.search('www') !== -1) {
+        window.location.replace(environment.siteAddress.two + extendPath);
+      } else {
+        window.location.replace(environment.siteAddress.one + extendPath);
+      }
+    }
   }
 
   activateAccountViaEmail(auth: Auth): void {
-
-
     this.pageUrl = environment.baseUrl + 'auth/activate-account-email';
     this.subscription.push(this.post(auth).subscribe(data => {
       this.alertService.clear();
       this.alertService.success(this.messageActivate, this.alertOptions);
-      setTimeout(() => {
-        this.router.navigate(['/home/sign-in']);
-      }, 2000);
+      delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
 
   sendActivateCodeViaEmail(auth: Auth): void {
-
     this.pageUrl = environment.baseUrl + 'auth/send-activate-email';
     this.subscription.push(this.post(auth).subscribe(data => {
       this.alertService.clear();
@@ -136,8 +120,6 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   }
 
   forgot(auth: Auth): void {
-
-
     this.pageUrl = environment.baseUrl + 'auth/forgot';
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();
@@ -146,27 +128,21 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   }
 
   signUp(auth: Auth): void {
-
     this.pageUrl = environment.baseUrl + 'auth/signup';
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageRegister, this.alertOptions);
-      setTimeout(() => {
-        this.router.navigate(['/home/sign-in']);
-      }, 2000);
+      delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
 
   }
 
   resetPasswordViaEmail(auth: Auth): void {
-
     this.pageUrl = environment.baseUrl + 'auth/reset-password-email';
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageReset, this.alertOptions);
-      setTimeout(() => {
-        this.router.navigate(['/home/sign-in']);
-      }, 2000);
+      delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
 
@@ -175,12 +151,9 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageReset, this.alertOptions);
-      setTimeout(() => {
-        this.router.navigate(['/home/sign-in']);
-      }, 2000);
+      delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
-
   public get authValue(): IAuth {
     return this.authChange.value;
   }
@@ -191,17 +164,12 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();
       this.alertService.success(this.messageActivate, this.alertOptions);
-      setTimeout(() => {
-        this.router.navigate(['/home/sign-in']);
-      }, 2000);
+      delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
-
   }
 
 
   sendActivateCodeViaSms(auth: Auth): void {
-
-
     this.pageUrl = environment.baseUrl + 'auth/send-activate-sms';
     this.subscription.push(this.post(auth).subscribe(() => {
       this.alertService.clear();

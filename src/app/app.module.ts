@@ -13,14 +13,11 @@ import {CookieService} from 'ngx-cookie-service';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {CsrfInterceptor} from './interceptors/csrf.interceptor';
-
 import {PerfectScrollbarModule} from 'ngx-perfect-scrollbar';
 import {PERFECT_SCROLLBAR_CONFIG} from 'ngx-perfect-scrollbar';
 import {PerfectScrollbarConfigInterface} from 'ngx-perfect-scrollbar';
 import {InternationalizationModule} from "./translate/internationalization.module";
 import {environment} from "../environments/environment";
-
-
 import {SocialLoginModule, SocialAuthServiceConfig} from '@abacritt/angularx-social-login';
 import {GoogleLoginProvider} from '@abacritt/angularx-social-login';
 import {SpinnerInterceptor} from "./interceptors/spinner.interceptor";

@@ -1,19 +1,18 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import { Component,} from '@angular/core';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 import {faTrash} from '@fortawesome/free-solid-svg-icons';
-
+import {ModalType} from "../../enums/modal.enum";
 
 @Component({
   selector: 'app-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
 })
-export class ModalComponent {
+export class ModalComponent  {
   faIcon = {faTrash};
-  deleteItem?: string;
-  constructor(public bsModalRef: BsModalRef
-  ) {
-
+  deleteItem!: string;
+  type:ModalType = ModalType.text;
+  constructor(public bsModalRef: BsModalRef) {
   }
 
   onModalHide(): void {
@@ -25,6 +24,4 @@ export class ModalComponent {
     this.bsModalRef.hide();
     this.bsModalRef.content.onClose.next(true);
   }
-
-
 }

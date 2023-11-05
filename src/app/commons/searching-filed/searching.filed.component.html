@@ -6,7 +6,7 @@
             [formGroup]="formGroup">
 
 
-      <input
+        <input
           class="au-input au-input--style2 col-md-6"
           type="text"
           id="_key"
@@ -18,10 +18,12 @@
           [ngClass]="{ 'is-invalid': formGroup.controls?.['_key']?.invalid  && formGroup.controls?.['_key']?.touched }"
           placeholder="{{ 'common.searchBy' | translate }} : {{sortValue}}">
         <button tooltip="{{ 'common.search' | translate }}" class="au-btn--submit" type="submit">
-          <fa-icon   [icon]="faIcon.faSearch" ></fa-icon>
+          <fa-icon [icon]="faIcon.faSearch"></fa-icon>
         </button>
-        <button tooltip="{{ 'common.newItem' | translate }}" (click)="onNewItem()" class="au-btn au-btn-icon au-btn--green au-btn--small">
-          <fa-icon   [icon]="faIcon.faPlus" ></fa-icon>
+        <button appActions [permissionType]="'post'" [permissionName]="this.getPermission()"
+                tooltip="{{ 'common.newItem' | translate }}" (click)="onNewItem()"
+                class="au-btn au-btn-icon au-btn--green au-btn--small">
+          <fa-icon [icon]="faIcon.faPlus"></fa-icon>
         </button>
 
       </form>
@@ -34,32 +36,39 @@
 <div class="row">
   <div class="col-md-12">
     <div class="form-header">
-    <div class=" " style="  display: inline-flex; margin-top: 15px ;margin-bottom: 15px">
+      <div class=" " style="  display: inline-flex; margin-top: 15px ;margin-bottom: 15px">
 
-      <div class="rs-select2--light ">
-        <button (click)="onOpenModal(templateSearch)" tooltip="{{ 'common.advanceSearch' | translate }}"
-                class="btn btn-info">
-          <fa-icon   [icon]="faIcon.faEllipsisH" ></fa-icon>
-        </button>
-      </div>
-      <div class="rs-select2--light ">
+        <div class="rs-select2--light ">
+          <button (click)="onOpenModal(templateSearch)" tooltip="{{ 'common.advanceSearch' | translate }}"
+                  class="btn btn-info">
+            <fa-icon [icon]="faIcon.faEllipsisH"></fa-icon>
+          </button>
+        </div>
+        <div class="rs-select2--light ">
 
-        <ng-select2 [(ngModel)]="sortValue" placeholder="{{ 'common.sortBy' | translate }}"
-                    (ngModelChange)="onChangeDataTable()"
-                    [data]="sortData"></ng-select2>
+          <ng-select2 [(ngModel)]="sortValue" placeholder="{{ 'common.sortBy' | translate }}"
+                      (ngModelChange)="onChangeDataTable()"
+                      [data]="sortData"></ng-select2>
 
-      </div>
-      <div class="rs-select2--light ">
-        <ng-select2 [(ngModel)]="orderValue" placeholder="{{ 'common.orderBy' | translate }}"
-                    (ngModelChange)="onChangeDataTable()"
-                    [data]="orderData"></ng-select2>
-      </div>
-      <div class="rs-select2--light " *ngIf="this.ruleData?.length!>0">
+        </div>
+        <div class="rs-select2--light ">
+          <ng-select2 [(ngModel)]="orderValue" placeholder="{{ 'common.orderBy' | translate }}"
+                      (ngModelChange)="onChangeDataTable()"
+                      [data]="orderData"></ng-select2>
+        </div>
 
-        <ng-select2 [(ngModel)]="this.ruleValue" placeholder="{{ 'common.ruleBy' | translate }}" (ngModelChange)="onChangeDataTable()"
-                    [data]="ruleData"></ng-select2>
+        <div class="rs-select2--light ">
+          <ng-select2 [(ngModel)]="pageValue"
+                      (ngModelChange)="onChangePaginate()"
+                      [data]="pageData"></ng-select2>
+        </div>
+        <div class="rs-select2--light " *ngIf="this.ruleData?.length!>0">
+
+          <ng-select2 [(ngModel)]="this.ruleValue" placeholder="{{ 'common.ruleBy' | translate }}"
+                      (ngModelChange)="onChangeDataTable()"
+                      [data]="ruleData"></ng-select2>
+        </div>
       </div>
-    </div>
     </div>
   </div>
 </div>
@@ -68,7 +77,7 @@
   <form novalidate (ngSubmit)="onSubmitAdvanceSearch()" [formGroup]="formAdvanceSearch">
 
     <div class="modal-header">
-      <fa-icon   [icon]="faIcon.faSearch" ></fa-icon>
+      <fa-icon [icon]="faIcon.faSearch"></fa-icon>
       <h4 class="modal-title pull-left">{{ 'common.advanceSearch' | translate }}</h4>
 
       <button type="button" class="close pull-right" aria-label="Close" (click)="onModalHide()">
@@ -82,7 +91,7 @@
 
         <button type="button" class="btn btn-success pull-right"
                 (click)="onAddField()" tooltip="{{ 'common.addValue' | translate }}">
-          <fa-icon   [icon]="faIcon.faPlus" ></fa-icon>
+          <fa-icon [icon]="faIcon.faPlus"></fa-icon>
         </button>
 
       </div>
@@ -185,7 +194,7 @@
         <div class="col-6">
           <button type="button" class="btn btn-danger btn pull-right" style="width: 100%"
                   (click)="onRemoveField(i)" tooltip="{{ 'common.removeValue' | translate }}">
-            <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
+            <fa-icon [icon]="faIcon.faTrash"></fa-icon>
           </button>
         </div>
       </div>
@@ -195,7 +204,8 @@
 
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="onModalHide()">{{ 'common.cancel' | translate }}</button>
-      <button [disabled]="formAdvanceSearch.invalid" type="submit" class="btn btn-primary">{{ 'common.confirm' | translate }}</button>
+      <button [disabled]="formAdvanceSearch.invalid" type="submit"
+              class="btn btn-primary">{{ 'common.confirm' | translate }}</button>
     </div>
   </form>
 

@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
 import {HomeService} from "../../../services/home.service";
 import { takeUntil} from "rxjs";
-import {IHome} from "../../../interfaces/home.interface";
+import {IHome} from "../../../interfaces/ihome.interface";
 import {HeaderService} from "../../../services/header.service";
 import {TranslateService} from "@ngx-translate/core";
 import {Router} from "@angular/router";
@@ -9,7 +9,7 @@ import {
   faEnvelope, faHome, faPhone, faAngleRight, faAngleUp
 } from "@fortawesome/free-solid-svg-icons";
 import {faFacebookF, faInstagram, faGooglePlus, faTwitter} from '@fortawesome/free-brands-svg-icons'
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {MainAbstract} from "../../../abstracts/main.abstract";
 
 @Component({
@@ -19,7 +19,7 @@ import {MainAbstract} from "../../../abstracts/main.abstract";
   encapsulation: ViewEncapsulation.None
 })
 export class FooterComponent extends MainAbstract implements OnInit, OnDestroy {
-  homeRows!: ResponseObject<IHome>;
+  homeRows!: IResponseObject<IHome>;
   faIcon = {
     faEnvelope, faPhone, faHome, faAngleRight,
     faFacebookF, faInstagram, faGooglePlus, faTwitter, faAngleUp

@@ -5,9 +5,10 @@ import {HttpClient} from "@angular/common/http";
 import {AlertService} from "./alert.service";
 import {TranslateService} from "@ngx-translate/core";
 import {environment} from "../../environments/environment";
-import {IOverView} from "../interfaces/over.view.interface";
+import {IOverView} from "../interfaces/iover.view.interface";
 import {Observable} from "rxjs";
-import {ResponseObject} from "../interfaces/response.object.interface";
+import {IResponseObject} from "../interfaces/iresponse.object.interface";
+import {OVERVIEW_SERVICE} from "../configs/path.constants";
 @Injectable({
   providedIn: 'root'
 })
@@ -20,12 +21,11 @@ export class OverViewService extends ApiService<IOverView> implements IApiCommon
     super(httpClient,
       alertService,
       translate);
-    this.pageUrl= environment.baseUrl + 'overView';
+    this.pageUrl= environment.baseUrl + OVERVIEW_SERVICE.base;
   }
 
 
-  query(argument?: number | string | object): Observable<ResponseObject<IOverView>> {
-
+  query(argument?: number | string | object): Observable<IResponseObject<IOverView>> {
     return super.get(argument);
   }
 

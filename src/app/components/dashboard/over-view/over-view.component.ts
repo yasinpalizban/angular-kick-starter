@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {faList} from "@fortawesome/free-solid-svg-icons";
-import {Subscription, takeUntil} from "rxjs";
+import {takeUntil} from "rxjs";
 import {OverViewService} from 'src/app/services/over.view.service';
-import {IOverView} from "../../../interfaces/over.view.interface";
-import {ResponseObject} from "../../../interfaces/response.object.interface";
+import {IOverView} from "../../../interfaces/iover.view.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {MainAbstract} from "../../../abstracts/main.abstract";
 
 @Component({
@@ -13,16 +13,15 @@ import {MainAbstract} from "../../../abstracts/main.abstract";
 })
 export class OverViewComponent extends MainAbstract implements OnInit {
   faIcon = {faList};
-  overViewRows!: ResponseObject<IOverView>;
+  overView!: IResponseObject<IOverView>;
 
   constructor(private overViewService: OverViewService) {
     super();
   }
 
   ngOnInit(): void {
-
      this.overViewService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.overViewRows = data;
+      this.overView = data;
     });
   }
 

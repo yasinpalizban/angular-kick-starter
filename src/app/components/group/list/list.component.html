@@ -1,10 +1,10 @@
 
 <div class="table-responsive table-responsive-data2">
 
-  <div >
+
     <app-searching-filed [service]="this.groupService" [redirectPath]="'group'" [dataSort]="this.sortData" ></app-searching-filed>
 
-  </div>
+
   <table class="table table-data2">
     <thead>
     <tr>
@@ -16,7 +16,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="tr-shadow" *ngFor=" let group of this.groupRows?.data; let i= index;">
+    <tr class="tr-shadow" *ngFor=" let group of this.group?.data; let i= index;">
       <td>{{i + 1}}</td>
       <td>
         <span class="block-email">{{group.name}}</span>
@@ -30,13 +30,13 @@
       <td>
         <div class="table-data-feature">
 
-          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(group.id)" class="item" data-toggle="tooltip">
+          <button appActions [permissionType]="'put'" [permissionName]="'group'" tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(group.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>
           </button>
-          <button  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(group.id,i)" class="item" data-toggle="tooltip">
+          <button  appActions [permissionType]="'delete'" [permissionName]="'group'"  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(group.id,i)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
           </button>
-          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(group.id)" class="item" data-toggle="tooltip">
+          <button  appActions [permissionType]="'get'" [permissionName]="'group'" tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(group.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>
           </button>
 

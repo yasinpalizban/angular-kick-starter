@@ -3,7 +3,7 @@
   <div>
 
     <app-searching-filed
-      [ruleSort]="this.groupRows"
+      [ruleSort]="this.group"
       [dataSort]="this.sortData"
       [redirectPath]="'user'"
       [service]="userService">
@@ -13,12 +13,6 @@
   <table class="table table-data2">
     <thead>
     <tr>
-      <!--      <th>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </th>-->
       <th>#</th>
       <th>{{ 'filed.userName' | translate }}</th>
       <th>{{ 'filed.activate' | translate }}</th>
@@ -27,13 +21,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="tr-shadow" *ngFor=" let user of this.userRows?.data; let i= index;">
-      <!--      <td>-->
-      <!--        <label class="au-checkbox">-->
-      <!--          <input type="checkbox">-->
-      <!--          <span class="au-checkmark"></span>-->
-      <!--        </label>-->
-      <!--      </td>-->
+    <tr class="tr-shadow" *ngFor=" let user of this.user?.data; let i= index;">
       <td>{{i + 1}}</td>
       <td>
         <span class="block-email">{{user.username}}</span>
@@ -52,15 +40,15 @@
       <td>
         <div class="table-data-feature">
 
-          <button tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(user.id)" class="item"
+          <button appActions [permissionType]="'put'" [permissionName]="'user'"  tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(user.id)" class="item"
                   data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faEdit"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(user.id,i)" class="item"
+          <button appActions [permissionType]="'delete'" [permissionName]="'user'"  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(user.id,i)" class="item"
                   data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faTrash"></fa-icon>
           </button>
-          <button tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(user.id)" class="item"
+          <button appActions [permissionType]="'get'" [permissionName]="'user'"  tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(user.id)" class="item"
                   data-toggle="tooltip">
             <fa-icon [icon]="faIcon.faEnvelopeOpen"></fa-icon>
           </button>

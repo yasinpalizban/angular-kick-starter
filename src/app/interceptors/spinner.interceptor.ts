@@ -3,13 +3,10 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor, HttpResponse
+  HttpInterceptor
 } from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {finalize, map} from 'rxjs/operators';
-import {
-  StatusCodes,
-} from 'http-status-codes';
 import {SpinnerService} from "../services/spinner.service";
 import {NgxSpinnerService} from "ngx-spinner";
 
