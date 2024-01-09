@@ -1,16 +1,14 @@
 import {Component, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
 import {HomeService} from "../../../services/home.service";
 import { takeUntil} from "rxjs";
-import {IHome} from "../../../interfaces/ihome.interface";
 import {HeaderService} from "../../../services/header.service";
 import {TranslateService} from "@ngx-translate/core";
 import {Router} from "@angular/router";
-import {
-  faEnvelope, faHome, faPhone, faAngleRight, faAngleUp
+import {faEnvelope, faHome, faPhone, faAngleRight, faAngleUp
 } from "@fortawesome/free-solid-svg-icons";
 import {faFacebookF, faInstagram, faGooglePlus, faTwitter} from '@fortawesome/free-brands-svg-icons'
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {MainAbstract} from "../../../abstracts/main.abstract";
+import {IHomeSetting} from "../../../interfaces/ihome";
 
 @Component({
   selector: 'app-website-footer',
@@ -19,7 +17,7 @@ import {MainAbstract} from "../../../abstracts/main.abstract";
   encapsulation: ViewEncapsulation.None
 })
 export class FooterComponent extends MainAbstract implements OnInit, OnDestroy {
-  homeRows!: IResponseObject<IHome>;
+  homeRows!: IHomeSetting[];
   faIcon = {
     faEnvelope, faPhone, faHome, faAngleRight,
     faFacebookF, faInstagram, faGooglePlus, faTwitter, faAngleUp
@@ -34,13 +32,9 @@ export class FooterComponent extends MainAbstract implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.homeService.settingList();
 
-    this.homeService.getDataObservable().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-
-      this.homeRows = data;
-
-
+    this.homeService.settingList().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.homeRows = value.data;
     });
   }
 
@@ -49,7 +43,6 @@ export class FooterComponent extends MainAbstract implements OnInit, OnDestroy {
   }
 
   changeLanguage(): void {
-
     if (localStorage.getItem('lang') === 'en') {
       localStorage.setItem('lang', 'fa');
       this.translate.use('fa');
@@ -62,14 +55,9 @@ export class FooterComponent extends MainAbstract implements OnInit, OnDestroy {
 
     const url = this.router.url.indexOf('?') !== -1 ?
       this.router.url.split('?')[0] : this.router.url;
-
     switch (url) {
       case  "/home/main":
-
         break;
-
-
     }
-
   }
 }

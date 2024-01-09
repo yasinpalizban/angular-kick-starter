@@ -22,6 +22,5 @@ export class ToastService {
 
   clear(): void {
     this.subject.next(new ToastModel());
-
   }
 }

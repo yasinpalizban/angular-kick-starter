@@ -3,11 +3,10 @@ import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {GroupService} from '../../../services/group.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IGroup} from '../../../interfaces/igroup.interface';
-import {IQuery} from '../../../interfaces/iquery.interface';
+import {IGroup} from '../../../interfaces/igroup';
+import {IQuery} from '../../../interfaces/iquery';
 import {Group} from '../../../models/group.model';
 import {faFileWord, faStickyNote} from "@fortawesome/free-solid-svg-icons";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {GROUP_SERVICE} from "../../../configs/path.constants";
 
@@ -18,7 +17,7 @@ import {GROUP_SERVICE} from "../../../configs/path.constants";
 })
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faStickyNote, faFileWord};
-  group!: IResponseObject<IGroup>;
+  group!: IGroup;
 
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
@@ -47,13 +46,12 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
   private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) => this.groupService.query(+params['id'])
-      )).subscribe((data) => {
-      this.group = data;
-      this.formGroup.controls['name'].setValue(data.data.name);
-      this.formGroup.controls['description'].setValue(data.data.description);
+      switchMap((params) => this.groupService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.group =value.data;
+      this.formGroup.controls['name'].setValue(value.data.name);
+      this.formGroup.controls['description'].setValue(value.data.description);
     });
-
 
     this.groupService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
       this.params = qParams;
@@ -62,7 +60,6 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-
     if (this.formGroup.invalid) {
       return;
     }
@@ -80,6 +77,4 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     this.unSubscription();
     this.groupService.unsubscribe();
   }
-
-
 }

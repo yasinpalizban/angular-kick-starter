@@ -2,9 +2,8 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {switchMap, takeUntil} from 'rxjs';
 import {UserService} from '../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IQuery} from '../../../interfaces/iquery.interface';
-import {IUser} from '../../../interfaces/iuser.interface';
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
+import {IQuery} from '../../../interfaces/iquery';
+import {IUser} from '../../../interfaces/iuser';
 import {BasicDetail} from "../../../abstracts/basic.detail";
 import {USER_SERVICE} from "../../../configs/path.constants";
 
@@ -15,7 +14,7 @@ import {USER_SERVICE} from "../../../configs/path.constants";
   styleUrls: ['./detail.component.scss']
 })
 export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
-  user!: IResponseObject<IUser>;
+  user!: IUser;
 
   constructor(
     private userService: UserService,
@@ -25,9 +24,9 @@ export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) =>  this.userService.query(+params['id'])
-      )).subscribe((data) => {
-      this.user = data;
+      switchMap((params) =>  this.userService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.user = value.data;
     });
 
 

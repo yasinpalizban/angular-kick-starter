@@ -36,5 +36,4 @@ export class ErrorService {
 
     return throwError(errorResponse);
   }
-
 }

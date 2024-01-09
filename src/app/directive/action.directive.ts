@@ -1,6 +1,6 @@
-import {Directive, ElementRef, Input, OnInit} from '@angular/core';
+import {Directive, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AuthenticateCheckerService} from "../services/authenticate.checker.service";
-import {IAuth} from "../interfaces/iauthenticate.interface";
+import {IAuth} from "../interfaces/iauthenticate";
 import {isValidToPassAuth} from "../utils/is.valid.to.pass.auth";
 
 @Directive({

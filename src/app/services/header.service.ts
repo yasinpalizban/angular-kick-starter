@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {INotification} from '../interfaces/inotification.interface';
+import {INotification} from '../interfaces/inotification';
 import {BehaviorSubject, Observable, Subject, Subscription, takeUntil} from 'rxjs';
 import {filter} from 'rxjs/operators';
 
@@ -10,8 +10,6 @@ import {explodeUrl} from '../utils/explode-url';
 // import Pusher from 'pusher-js';
 import {urlPath} from '../utils/url-path';
 import {HeaderServiceInterface} from "../interfaces/header.service.interface";
-
-
 declare const Pusher: any;
 
 @Injectable({
@@ -41,8 +39,6 @@ export class HeaderService implements HeaderServiceInterface {
       });
     } catch (e) {
     }
-
-
   }
 
   checkUrlParams(): void {
@@ -62,10 +58,8 @@ export class HeaderService implements HeaderServiceInterface {
           const val = urlPath(nav.url);
           this.urlPath.next(val);
         }
-
       });
   }
-
 
   checkNotification(): void {
 
@@ -96,10 +90,7 @@ export class HeaderService implements HeaderServiceInterface {
         this.newNotification.next(notify);
       });
     } catch (e) {
-
     }
-
-
   }
 
   getNewNotification(): Observable<INotification> {

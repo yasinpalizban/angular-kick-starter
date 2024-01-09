@@ -4,18 +4,18 @@
     <tbody>
     <tr>
       <td>{{ 'filed.name' | translate }}</td>
-      <td>{{this.permission.data.name }}</td>
+      <td>{{this.permission.name }}</td>
     </tr>
 
 
     <tr>
       <td>{{ 'filed.description' | translate }}</td>
-      <td>{{this.permission.data.description}}</td>
+      <td>{{this.permission.description}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.activate' | translate }}</td>
-      <td><span *ngIf="this.permission.data.active==true" class="status--process">  {{ 'filed.activate' | translate }}</span>
-        <span *ngIf="this.permission.data.active==false" class="status--denied">  {{ 'filed.deActivate' | translate }}</span>
+      <td><span *ngIf="this.permission.active==true" class="status--process">  {{ 'filed.activate' | translate }}</span>
+        <span *ngIf="this.permission.active==false" class="status--denied">  {{ 'filed.deActivate' | translate }}</span>
       </td>
     </tr>
     </tbody>

@@ -1,8 +1,8 @@
-import {IPagination} from "./ipagination.interface";
+import {IPagination} from "./ipagination";
 
 export interface IResponseObject<T> {
   pager?: IPagination;
-  data?: any| any[]| T[] | T;
+  data:  T;
   insertId?: number;
   success?: boolean;
   statusMessage?: string

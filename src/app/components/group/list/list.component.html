@@ -2,7 +2,7 @@
 <div class="table-responsive table-responsive-data2">
 
 
-    <app-searching-filed [service]="this.groupService" [redirectPath]="'group'" [dataSort]="this.sortData" ></app-searching-filed>
+    <app-searching-filed [service]="this.groupService" [redirectPath]="'item'" [dataSort]="this.sortData" ></app-searching-filed>
 
 
   <table class="table table-data2">
@@ -16,27 +16,27 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="tr-shadow" *ngFor=" let group of this.group?.data; let i= index;">
+    <tr class="tr-shadow" *ngFor=" let item of this.group; let i= index;">
       <td>{{i + 1}}</td>
       <td>
-        <span class="block-email">{{group.name}}</span>
+        <span class="block-email">{{item.name}}</span>
       </td>
 
 
       <td>
-        <span class="">{{group.description.substring(0,100)}}</span>
+        <span class="">{{item.description.substring(0,100)}}</span>
       </td>
 
       <td>
         <div class="table-data-feature">
 
-          <button appActions [permissionType]="'put'" [permissionName]="'group'" tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(group.id)" class="item" data-toggle="tooltip">
+          <button appActions [permissionType]="this.permissionType.Put" [permissionName]="this.permissionName"  tooltip="{{ 'common.edit' | translate }}" (click)="onEditItem(item.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>
           </button>
-          <button  appActions [permissionType]="'delete'" [permissionName]="'group'"  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(group.id,i)" class="item" data-toggle="tooltip">
+          <button  appActions [permissionType]="this.permissionType.Delete" [permissionName]="this.permissionName"   tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(item.id,i)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
           </button>
-          <button  appActions [permissionType]="'get'" [permissionName]="'group'" tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(group.id)" class="item" data-toggle="tooltip">
+          <button  appActions [permissionType]="this.permissionType.Get" [permissionName]="this.permissionName"  tooltip="{{ 'common.detail' | translate }}" (click)="onDetailItem(item.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>
           </button>
 

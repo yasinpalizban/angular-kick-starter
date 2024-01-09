@@ -6,8 +6,8 @@ import { filter} from 'rxjs/operators';
 import {TranslateService} from '@ngx-translate/core';
 import {IApiService} from '../interfaces/api.service.interface';
 import {queryParamType} from "../utils/query.param.type";
-import {IQuery} from "../interfaces/iquery.interface";
-import {IResponseObject} from "../interfaces/iresponse.object.interface";
+import {IQuery} from "../interfaces/iquery";
+import {IResponseObject} from "../interfaces/iresponse.object";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,6 @@ export class ApiService<T> implements IApiService<T> {
     autoClose: true,
     keepAfterRouteChange: false,
     body: []
-
   };
 
   constructor(protected httpClient: HttpClient,
@@ -36,24 +35,30 @@ export class ApiService<T> implements IApiService<T> {
     this.messageDelete = this.translate.instant('common.messageDelete');
   }
 
-  public get(argument?: number | string | object | null): Observable<IResponseObject<T>> {
+  public get(argument?: number | string | object | null): Observable<IResponseObject<T[]>> {
     const {params, queries} = queryParamType(argument);
     return this.httpClient
-      .get<T>(this.pageUrl + queries,
+      .get<IResponseObject<T[]>>(this.pageUrl + queries,
         {
           params
         });
   }
 
+  public show(argument?: number): Observable<IResponseObject<T>> {
+    return this.httpClient
+      .get<IResponseObject<T>>(this.pageUrl + (argument ?  ('/' + argument) :''));
+  }
+
+
   public post(data: any): Observable<IResponseObject<T>> {
-    return this.httpClient.post<T>(this.pageUrl, data);
+    return this.httpClient.post<IResponseObject<T>>(this.pageUrl, data);
   }
 
   public put(data: any): Observable<IResponseObject<T>> {
     if (data instanceof FormData) {
-      return this.httpClient.post<T>(this.pageUrl + '/' + data.get('id'), data);
+      return this.httpClient.post<IResponseObject<T>>(this.pageUrl + '/' + data.get('id'), data);
     } else {
-      return this.httpClient.put<T>(this.pageUrl + '/' + data.id, data);
+      return this.httpClient.put<IResponseObject<T>>(this.pageUrl + '/' + data.id, data);
     }
   }
 
@@ -62,7 +67,7 @@ export class ApiService<T> implements IApiService<T> {
     if (foreignKey !== undefined) {
       params = new HttpParams().append('foreignKey', foreignKey.toString());
     }
-    return this.httpClient.delete<T>(this.pageUrl + '/' + id, {params});
+    return this.httpClient.delete<IResponseObject<T>>(this.pageUrl + '/' + id, {params});
   }
 
   getDataObservable(): Observable<any> {

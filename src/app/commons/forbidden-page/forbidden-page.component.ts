@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {RoleType} from "../../enums/role.enum";
 import {AuthenticateCheckerService} from "../../services/authenticate.checker.service";
-import {IAuth} from "../../interfaces/iauthenticate.interface";
+import {IAuth} from "../../interfaces/iauthenticate";
 import {Subscription} from "rxjs";
 
 @Component({

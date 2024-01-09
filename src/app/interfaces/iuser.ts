@@ -1,4 +1,4 @@
-import {IBasic} from "./ibasic.interface";
+import {IBasic} from "./ibasic";
 
 export interface IUser extends  IBasic{
     email: string,

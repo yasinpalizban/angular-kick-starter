@@ -2,16 +2,15 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IQuery} from '../../../interfaces/iquery.interface';
+import {IQuery} from '../../../interfaces/iquery';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
-import {IPermissionGroup} from "../../../interfaces/ipermission.group.interface";
+import {IPermissionGroup} from "../../../interfaces/ipermission.group";
 import {PermissionGroupService} from "../../../services/permission.group.service";
 import {PermissionGroup} from "../../../models/permission.group.model";
-import {IGroup} from "../../../interfaces/igroup.interface";
-import {IPermission} from "../../../interfaces/ipermission.interface";
+import {IGroup} from "../../../interfaces/igroup";
+import {IPermission} from "../../../interfaces/ipermission";
 import {GroupService} from "../../../services/group.service";
 import {PermissionService} from "../../../services/permission.service";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 
@@ -23,9 +22,9 @@ import {PERMISSION_GROUP_SERVICE} from "../../../configs/path.constants";
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
 
-  permissionGroup!: IResponseObject<IPermissionGroup>;
-  group!: IResponseObject<IGroup>;
-  permission!: IResponseObject<IPermission>;
+  permissionGroup!: IPermissionGroup;
+  group!: IGroup[];
+  permission!: IPermission[];
   isGet: boolean = false;
   isPut: boolean = false;
   isPost: boolean = false;
@@ -58,27 +57,26 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.initData();
     this.initForm();
+    this.initData();
   }
 
   private initData(): void {
-    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.group = data;
+    this.groupService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.group = value.data;
     });
-    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.permission = data;
+    this.permissionService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.permission = value.data;
     });
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) => this.permissionGroupService.query(+params['id'])
-      )).subscribe((data) => {
-      this.permissionGroup = data;
-      this.formGroup.controls['groupId'].setValue(data.data.groupId);
-      this.formGroup.controls['permissionId'].setValue(data.data.permissionId);
+      switchMap((params) => this.permissionGroupService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.permissionGroup = value.data;
+      this.formGroup.controls['groupId'].setValue(value.data.groupId);
+      this.formGroup.controls['permissionId'].setValue(value.data.permissionId);
     });
 
-
-    this.permissionGroup.data.actions.split("-").forEach((value: string) => {
+    this.permissionGroup.actions.split("-").forEach((value: string) => {
       if (value === "get")
         this.isGet = true;
       else if (value === "post")
@@ -96,12 +94,9 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     let combineAction = '';
@@ -111,7 +106,6 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       groupId: this.formGroup.value.groupId,
       permissionId: this.formGroup.value.permissionId,
       actions: combineAction,
-
     });
     this.permissionGroupService.clearAlert();
     this.permissionGroupService.update(permissionGroup, this.params);
@@ -126,7 +120,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     if (!this.isCheck) {
       this.isCheck = true;
-      const actBox = this.permissionGroup.data.actions.split("-");
+      const actBox = this.permissionGroup.actions.split("-");
       actBox.forEach((value: string) => {
         if (value)
           actions.push(new FormControl("-" + value));
@@ -140,8 +134,5 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
       const index = actions.controls.findIndex(x => x.value === e.target.value);
       actions.removeAt(index);
     }
-
-
   }
-
 }

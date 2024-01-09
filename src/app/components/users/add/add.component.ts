@@ -4,9 +4,8 @@ import {takeUntil} from 'rxjs';
 import {UserService} from '../../../services/user.service';
 import {User} from '../../../models/user.model';
 import {GroupService} from "../../../services/group.service";
-import {IGroup} from "../../../interfaces/igroup.interface";
+import {IGroup} from "../../../interfaces/igroup";
 import {faPhone, faUser, faAsterisk, faEnvelope, faUsers} from '@fortawesome/free-solid-svg-icons';
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {Router} from "@angular/router";
 
@@ -18,7 +17,7 @@ import {Router} from "@angular/router";
 export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faPhone, faUser, faAsterisk, faEnvelope, faUsers};
   defaultPassword: string = 'abc123456';
-  group!: IResponseObject<IGroup>;
+  group!: IGroup[];
 
   constructor(private formBuilder: FormBuilder,
               private userService: UserService,
@@ -33,8 +32,8 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   private initData(): void {
-    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.group = data;
+    this.groupService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.group = value.data;
     });
   }
 

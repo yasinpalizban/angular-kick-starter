@@ -18,7 +18,7 @@
 
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let group of this.group?.data; let i=index" value="{{group.id}}">{{group.name}}</option>
+        <option *ngFor="let item of this.group; let i=index" value="{{item.id}}">{{item.name}}</option>
 
       </select>
       <div class="input-group-addon">
@@ -50,8 +50,8 @@
 
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let permission of this.permission?.data; let i=index"
-                value="{{permission.id}}">{{permission.name}}</option>
+        <option *ngFor="let item of this.permission; let i=index"
+                value="{{item.id}}">{{item.name}}</option>
 
       </select>
       <div class="input-group-addon">
@@ -75,25 +75,12 @@
       <div class="input-group-addon">{{ 'filed.actions' | translate }}</div>
 
       <div class="form-control form-check-inline form-check" style="border: none">
-<!--        <label *ngFor="let act of this.actionsArray; let i = index"-->
-<!--               for="inline-checkbox1"-->
-<!--               class="switch switch-text switch-primary switch-pill m-r-10 m-l-20">-->
-<!--          <input-->
-<!--            (change)="onCheckboxChange($event)"-->
-<!--            type="checkbox"-->
-<!--            id="inline-checkbox1"-->
-<!--            value="{{act.value}}"-->
-<!--            class="form-check-input witch-input">{{ act.name}}-->
-
-<!--        </label>-->
 
         <label style="  transform: scale(1)" class="switch switch-text switch-primary switch-pill lg m-r-10 m-l-20">
           <input  value="-get" (change)="onCheckboxChange($event)" type="checkbox" class="switch-input " >
           <span data-on="Get" data-off="Get" class="switch-label"></span>
           <span class="switch-handle"></span>
         </label>
-
-
 
         <label style="  transform: scale(1)" class="switch switch-text switch-success switch-pill m-r-5 m-l-5">
           <input value="-post" (change)="onCheckboxChange($event)" type="checkbox" class="switch-input" >
@@ -112,10 +99,6 @@
           <span class="switch-handle"></span>
         </label>
 
-
-
-
-
       </div>
       <div class="input-group-addon">
         <fa-icon [icon]="faIcon.faAsterisk"></fa-icon>
@@ -123,7 +106,6 @@
 
     </div>
   </div>
-
 
   <div class="form-actions form-group ">
     <button [disabled]="formGroup.invalid" type="submit"

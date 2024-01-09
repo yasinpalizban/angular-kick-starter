@@ -1,64 +1,58 @@
 <div class="table-responsive">
   <table class="table table-top-campaign">
     <tbody>
-
-    <!--    <tr>-->
-    <!--      <td>{{ 'filed.image' | translate }}</td>-->
-
-    <!--      <td>{{this.userDetail.data.image  }}</td>-->
-    <!--    </tr>-->
     <tr>
       <td>{{ 'filed.userName' | translate }}</td>
 
-      <td>{{this.user.data.username  }}</td>
+      <td>{{this.user.username  }}</td>
     </tr>
     <tr>
       <td>{{ 'filed.email' | translate }}</td>
-      <td>{{this.user.data.email}}</td>
+      <td>{{this.user.email}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.phone' | translate }}</td>
-      <td>{{this.user.data.phone}}</td>
+      <td>{{this.user.phone}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.group' | translate }}</td>
-      <td>{{this.user.data.group}}</td>
+      <td>{{this.user.group}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.firstName' | translate }}</td>
-      <td>{{this.user.data.firstName}}</td>
+      <td>{{this.user.firstName}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.lastName' | translate }}</td>
-      <td>{{this.user.data.lastName}}</td>
+      <td>{{this.user.lastName}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.gender' | translate }}</td>
-      <td>{{this.user.data.gender}}</td>
+      <td>{{this.user.gender}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.country' | translate }}</td>
-      <td>{{this.user.data.country}}</td>
+      <td>{{this.user.country}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.city' | translate }}</td>
-      <td>{{this.user.data.city}}</td>
+      <td>{{this.user.city}}</td>
     </tr>
     <tr>
       <td>{{ 'filed.address' | translate }}</td>
-      <td>{{this.user.data.address}}</td>
+      <td>{{this.user.address}}</td>
     </tr>
 
 
     <tr>
       <td>{{ 'filed.activate' | translate }}</td>
       <td>
-        <span *ngIf="this.user.data.active==true"
+        <span *ngIf="this.user.active==true"
               class="status--process"> {{ 'filed.activate' | translate }}</span>
-        <span *ngIf="this.user.data.active==false"
+        <span *ngIf="this.user.active==false"
               class="status--denied"> {{ 'filed.deActivate' | translate }}</span>
 
       </td>
@@ -66,21 +60,21 @@
     <tr>
       <td>{{ 'filed.status' | translate }}</td>
       <td>
-        <span *ngIf="this.user.data.status==true"
+        <span *ngIf="this.user.status==true"
               class="status--process"> {{ 'filed.activate' | translate }}</span>
-        <span *ngIf="this.user.data.status==false"
+        <span *ngIf="this.user.status==false"
               class="status--denied"> {{ 'filed.deActivate' | translate }}</span>
 
       </td>
     </tr>
     <tr>
       <td>{{ 'filed.description' | translate }}</td>
-      <td>{{this.user.data.createdAt|date}}</td>
+      <td>{{this.user.createdAt|date}}</td>
     </tr>
 
     <tr>
       <td>{{ 'filed.create' | translate }}</td>
-      <td>{{this.user.data.createdAt|date}}</td>
+      <td>{{this.user.createdAt|date}}</td>
     </tr>
 
     </tbody>

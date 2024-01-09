@@ -1,12 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {takeUntil} from 'rxjs';
-import {IProfile} from '../../../interfaces/iprofile.interface';
+import {IProfile} from '../../../interfaces/iprofile';
 import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {faMapMarker, faAddressBook, faMap} from "@fortawesome/free-solid-svg-icons";
 import {BasicForm} from "../../../abstracts/basic.form";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {Router} from "@angular/router";
 
 @Component({
@@ -20,7 +19,7 @@ export class UserAddressComponent extends BasicForm implements OnInit, OnDestroy
   };
 
 
-  profile!: IResponseObject<IProfile>;
+  profile!: IProfile;
 
   constructor(private formBuilder: FormBuilder,
               private profileService: ProfileService,
@@ -53,37 +52,30 @@ export class UserAddressComponent extends BasicForm implements OnInit, OnDestroy
   }
 
   private initData(): void {
-    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.profile = data;
-      this.formGroup.controls['country'].setValue(data.data!.country);
-      this.formGroup.controls['city'].setValue(data.data!.city);
-      this.formGroup.controls['address'].setValue(data.data!.address);
+    this.profileService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.profile = value.data;
+      this.formGroup.controls['country'].setValue(value.data!.country);
+      this.formGroup.controls['city'].setValue(value.data!.city);
+      this.formGroup.controls['address'].setValue(value.data!.address);
     });
 
   }
 
   onSubmit(): void {
-
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
-
     const profile = new Profile({
       address: this.formGroup.value.address,
       country: this.formGroup.value.country,
       city: this.formGroup.value.city,
     });
-
     this.profileService.save(profile);
-
   }
 
   override ngOnDestroy(): void {
     this.profileService.unsubscribe();
     this.unSubscription();
   }
-
 }

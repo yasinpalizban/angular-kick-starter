@@ -5,16 +5,16 @@ import {HttpClient} from "@angular/common/http";
 import {AlertService} from "./alert.service";
 import {TranslateService} from "@ngx-translate/core";
 import {environment} from "../../environments/environment";
-import {IGraph} from "../interfaces/igraph.interface";
+import {IGraph} from "../interfaces/igraph";
 import {Graph} from "../models/graph.model";
-import {IResponseObject} from "../interfaces/iresponse.object.interface";
+import {IResponseObject} from "../interfaces/iresponse.object";
 import {Observable} from "rxjs";
 import {GRAPH_SERVICE} from "../configs/path.constants";
 
 @Injectable({
   providedIn: 'root'
 })
-export class GraphService extends ApiService<IResponseObject<IGraph>> implements IApiCommonFunction {
+export class GraphService extends ApiService<IGraph> implements IApiCommonFunction {
 
   constructor(protected override httpClient: HttpClient,
               protected override alertService: AlertService,
@@ -26,14 +26,13 @@ export class GraphService extends ApiService<IResponseObject<IGraph>> implements
     this.pageUrl=     environment.baseUrl + GRAPH_SERVICE.base;
   }
 
-
-  query(argument?: number | string | object): Observable<IResponseObject<IGraph>> {
+  retrieve(argument?: number | string | object): Observable<IResponseObject<IGraph[]>> {
  return  super.get(argument);
   }
 
-  save(graph: Graph): Observable<IResponseObject<IGraph>> {
+  save(graph: Graph): Observable<IResponseObject<IGraph[]>> {
+    // @ts-ignore
     return this.post(graph);
   }
-
 
 }

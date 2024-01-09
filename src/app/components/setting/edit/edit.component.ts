@@ -4,9 +4,8 @@ import {SettingService} from '../../../services/setting.service';
 import {Setting} from '../../../models/setting.model';
 import {ActivatedRoute,  Router} from '@angular/router';
 import { switchMap, takeUntil} from 'rxjs';
-import {ISetting} from '../../../interfaces/isetting.interface';
+import {ISetting} from '../../../interfaces/isetting';
 import {faAddressBook, faEye, faFileWord} from "@fortawesome/free-solid-svg-icons";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {SETTING_SERVICE} from "../../../configs/path.constants";
 
@@ -20,7 +19,7 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {
     faEye, faFileWord, faAddressBook
   };
-  setting!: IResponseObject<ISetting>;
+  setting!: ISetting;
 
   constructor(private formBuilder: FormBuilder,
               private settingService: SettingService,
@@ -59,13 +58,13 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
   private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) => this.settingService.query(+params['id'])
-      )).subscribe((data) => {
-      this.setting = data;
-      this.formGroup.controls['_key'].setValue(data.data.key);
-      this.formGroup.controls['_value'].setValue(data.data.value);
-      this.formGroup.controls['description'].setValue(data.data.description);
-      this.formGroup.controls['status'].setValue(+data.data.status);
+      switchMap((params) => this.settingService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.setting = value.data;
+      this.formGroup.controls['_key'].setValue(value.data.key);
+      this.formGroup.controls['_value'].setValue(value.data.value);
+      this.formGroup.controls['description'].setValue(value.data.description);
+      this.formGroup.controls['status'].setValue(+value.data.status);
     });
 
     this.settingService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams) => {

@@ -1,7 +1,6 @@
-import {AfterViewInit, Component, DoCheck, OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
-import {Subscription, takeUntil} from "rxjs";
+import { Component,  OnDestroy, OnInit, ViewEncapsulation} from '@angular/core';
+import { takeUntil} from "rxjs";
 import {HomeService} from "../../services/home.service";
-import {IHome} from "../../interfaces/ihome.interface";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {environment} from "../../../environments/environment";
 import {
@@ -13,7 +12,7 @@ import {
 import {HeaderService} from "../../services/header.service";
 import {faFacebookF, faGooglePlus, faInstagram, faTwitter} from "@fortawesome/free-brands-svg-icons";
 
-import {IQuery} from "../../interfaces/iquery.interface";
+import {IQuery} from "../../interfaces/iquery";
 import {MainAbstract} from "../../abstracts/main.abstract";
 
 @Component({

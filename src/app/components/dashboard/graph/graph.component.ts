@@ -7,10 +7,9 @@ import {AlertService} from "../../../services/alert.service";
 import { takeUntil} from "rxjs";
 import {Graph} from "../../../models/graph.model";
 import {getDateByName} from "../../../utils/get.date.by.name";
-import {IGraph} from "../../../interfaces/igraph.interface";
+import {IGraph} from "../../../interfaces/igraph";
 import {Color} from "@swimlane/ngx-charts/lib/utils/color-sets";
 import {ScaleType} from "@swimlane/ngx-charts";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {Router} from "@angular/router";
 
@@ -20,7 +19,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./graph.component.scss']
 })
 export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
-  graph!: IResponseObject<IGraph>;
+  graph!: IGraph[];
   faIcon = {faChartArea, faList, faAsterisk, faCalendar};
   view: number[] = [600, 400];
   // options for the chart
@@ -69,11 +68,10 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   private initData(): void {
-    this.graphService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.graph = data;
+    this.graphService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.graph = value.data;
     });
   }
-
 
   onSubmit(): void {
     if ((!this.formGroup.value.date || this.formGroup.value.date == 'none') &&
@@ -89,16 +87,14 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
 
     const fromDate: string = this.formGroup.value.fromDate.length > 0 ? this.formGroup.value.fromDate : getDateByName(this.formGroup.value.date);
     const toDate: string = this.formGroup.value.toDate.length > 0 ? this.formGroup.value.toDate : getDateByName('today');
-
     this.submitted = true;
     const graph = new Graph({
       type: this.formGroup.value._type,
       toDate: toDate.replace("\//", "-"),
       fromDate: fromDate.replace("\//", "-")
     });
-
-    this.graphService.save(graph).pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.graph = data;
+    this.graphService.save(graph).pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.graph = value.data;
     });
   }
 
@@ -106,5 +102,4 @@ export class GraphComponent extends BasicForm implements OnInit, OnDestroy {
     this.unSubscription();
     this.graphService.unsubscribe();
   }
-
 }

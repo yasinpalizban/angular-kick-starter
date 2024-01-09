@@ -2,12 +2,11 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {switchMap, takeUntil} from 'rxjs';
-import {IQuery} from '../../../interfaces/iquery.interface';
+import {IQuery} from '../../../interfaces/iquery';
 import {faFileWord, faStickyNote, faEye} from "@fortawesome/free-solid-svg-icons";
-import {IPermission} from "../../../interfaces/ipermission.interface";
+import {IPermission} from "../../../interfaces/ipermission";
 import {PermissionService} from "../../../services/permission.service";
 import {Permission} from "../../../models/permission.model";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 
@@ -18,7 +17,7 @@ import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 })
 export class EditComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faStickyNote, faFileWord, faEye};
-  permission!: IResponseObject<IPermission>;
+  permission!: IPermission;
 
   constructor(private formBuilder: FormBuilder,
               private permissionService: PermissionService,
@@ -51,12 +50,12 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
 
   private initData(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) => this.permissionService.query(+params['id'])
-      )).subscribe((data) => {
-      this.permission = data;
-      this.formGroup.controls['name'].setValue(data.data.name);
-      this.formGroup.controls['description'].setValue(data.data.description);
-      this.formGroup.controls['active'].setValue(data.data.active);
+      switchMap((params) => this.permissionService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.permission = value.data;
+      this.formGroup.controls['name'].setValue(value.data.name);
+      this.formGroup.controls['description'].setValue(value.data.description);
+      this.formGroup.controls['active'].setValue(value.data.active);
     });
 
     this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {
@@ -84,6 +83,5 @@ export class EditComponent extends BasicForm implements OnInit, OnDestroy {
     this.unSubscription();
     this.permissionService.unsubscribe();
   }
-
 
 }

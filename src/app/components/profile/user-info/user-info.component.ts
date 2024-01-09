@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, Validators} from '@angular/forms';
 import {takeUntil} from 'rxjs';
-import {IProfile} from '../../../interfaces/iprofile.interface';
+import {IProfile} from '../../../interfaces/iprofile';
 import {ProfileService} from '../../../services/profile.service';
 import {Profile} from '../../../models/profile.model';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -15,7 +15,6 @@ import {
   faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
 import {BasicForm} from "../../../abstracts/basic.form";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {Router} from "@angular/router";
 
 
@@ -26,7 +25,7 @@ import {Router} from "@angular/router";
 })
 export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faPhone, faUser, faEnvelope, faVenusMars, faStickyNote};
-  profile!: IResponseObject<IProfile>;
+  profile!: IProfile;
   image: SafeUrl | string = 'assets/images/icon/default-avatar.jpg';
   isNewImage: boolean = false;
   formData = new FormData();
@@ -44,9 +43,7 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
     if (url.toString().indexOf('assets') !== -1 || this.isNewImage) {
       return this.image;
     } else {
-
       return this.sanitizer.bypassSecurityTrustUrl(environment.siteUrl + url);
-
     }
   }
 
@@ -90,30 +87,29 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initForm();
     this.initData();
-
   }
 
   private initData(): void {
-    this.profileService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.profile = data;
-      this.formGroup.controls['firstName'].setValue(data.data!.firstName);
-      this.formGroup.controls['lastName'].setValue(data.data!.lastName);
-      this.formGroup.controls['gender'].setValue(data.data!.gender);
-      this.formGroup.controls['phone'].setValue(data.data!.phone);
-      this.formGroup.controls['title'].setValue(data.data!.title);
-      this.formGroup.controls['bio'].setValue(data.data!.bio);
-      this.formGroup.controls['email'].setValue(data.data!.email);
-      this.formGroup.controls['username'].setValue(data.data!.username);
+    this.profileService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.profile = value.data;
+      this.formGroup.controls['firstName'].setValue(value.data!.firstName);
+      this.formGroup.controls['lastName'].setValue(value.data!.lastName);
+      this.formGroup.controls['gender'].setValue(value.data!.gender);
+      this.formGroup.controls['phone'].setValue(value.data!.phone);
+      this.formGroup.controls['title'].setValue(value.data!.title);
+      this.formGroup.controls['bio'].setValue(value.data!.bio);
+      this.formGroup.controls['email'].setValue(value.data!.email);
+      this.formGroup.controls['username'].setValue(value.data!.username);
 
       this.formGroup.controls['username'].disable();
-      if (data?.data!.phone) {
+      if (value?.data!.phone) {
         this.formGroup.controls['phone'].disable();
       }
-      if (data?.data!.email) {
+      if (value?.data!.email) {
         this.formGroup.controls['email'].disable();
       }
-      if (data.data!.image != null) {
-        this.image = data.data!.image;
+      if (value.data!.image != null) {
+        this.image = value.data!.image;
       }
 
     });
@@ -121,14 +117,10 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
-
     const profile = new Profile({
       firstName: this.formGroup.value.firstName,
       lastName: this.formGroup.value.lastName,
@@ -137,15 +129,10 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
       title: this.formGroup.value.bio,
       bio: this.formGroup.value.bio
     });
-
     this.profileService.save(profile);
-
     if (this.isNewImage === true) {
       this.profileService.save(this.formData);
-
     }
-
-
   }
 
   override ngOnDestroy(): void {
@@ -153,32 +140,10 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
     this.unSubscription();
   }
 
-
   updateImage($event: Event): void {
-
-    // const fileReader = new FileReader();
-    // const element = $event.currentTarget as HTMLInputElement;
-    // this.image = this.sanitizer.bypassSecurityTrustUrl(
-    //   window.URL.createObjectURL(element.files[0])
-    // );
-    // this.formGroup.patchValue({
-    //   image: element.files[0]
-    // });
-    // this.formGroup.query('image').updateValueAndValidity();
-    // File Preview
-    // const reader = new FileReader();
-    // let preview = "";
-    // reader.onload = () => {
-    //   preview = reader.result as string;
-    // }
-    // reader.readAsDataURL(element.files[0])
-
-
     const file = ($event.target as HTMLInputElement).files![0];
-
     this.formGroup.get('image')!.updateValueAndValidity();
 
-    // File Preview
     const reader = new FileReader();
     const preview = '';
     reader.onload = () => {
@@ -189,6 +154,4 @@ export class UserInfoComponent extends BasicForm implements OnInit, OnDestroy {
     };
     reader.readAsDataURL(file);
   }
-
-
 }

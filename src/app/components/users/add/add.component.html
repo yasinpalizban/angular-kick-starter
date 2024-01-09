@@ -152,7 +152,7 @@
 
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let group of this.group?.data; let i=index" value="{{group.id}}">{{group.name}}</option>
+        <option *ngFor="let group of this.group; let i=index" value="{{group.id}}">{{group.name}}</option>
 
       </select>
       <div class="input-group-addon">

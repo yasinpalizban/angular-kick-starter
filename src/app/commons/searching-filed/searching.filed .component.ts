@@ -9,7 +9,7 @@ import {CompressSearchForm} from '../../utils/compress-search-form';
 import {faAsterisk, faEllipsisH, faPlus, faSearch, faTrash, faTasks} from "@fortawesome/free-solid-svg-icons";
 import {convertSign} from "../../utils/convert.sign";
 import {isEmpty} from "../../utils/is.empty";
-import {IQuery} from "../../interfaces/iquery.interface";
+import {IQuery} from "../../interfaces/iquery";
 
 @Component({
   selector: 'app-searching-filed',

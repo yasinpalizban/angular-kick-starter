@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {IAuth} from '../interfaces/iauthenticate.interface';
+import {IAuth} from '../interfaces/iauthenticate';
 import {Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -48,14 +48,13 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
 
   signIn(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/signin';
-    this.subscription.push(this.post(auth).pipe(tap((auth) => {
-      this.authChange.next(auth.data);
-      localStorage.setItem('user', JSON.stringify(auth.data));
-    })).subscribe((data) => {
-      let address: string = window.location.origin;
+    this.subscription.push(this.post(auth).pipe(tap((value) => {
+      this.authChange.next(value.data);
+      localStorage.setItem('user', JSON.stringify(value.data));
+    })).subscribe((value) => {
+      const address: string = window.location.origin;
       let pathRedirect = '/admin/dashboard/over-view';
-      // @ts-ignore
-      if (data.data.role.name == RoleType.Member) {
+      if (value.data.role?.name == RoleType.Member) {
         pathRedirect = '/admin/profile';
       }
       if (address.search('www') !== -1) {
@@ -63,9 +62,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
       } else {
         window.location.replace(environment.siteAddress.one + pathRedirect);
       }
-
     }));
-
   }
 
   signOut(): void {
@@ -75,7 +72,6 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
     localStorage.removeItem('user');
     localStorage.removeItem('chatRoom');
     localStorage.removeItem('csrf');
-    // this.router.navigate(['./../../home/sign-in']);
     let address: string = window.location.origin;
     if (address.search('www') !== -1) {
       window.location.replace(environment.siteAddress.two + '/home/sign-in');
@@ -89,7 +85,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
     this.pageUrl = environment.baseUrl + 'auth/is-signin';
     const user: IAuth = JSON.parse(localStorage.getItem('user')!);
     if (user != null && !(user.jwt?.expire! < Math.floor(new Date().getTime() / 1000))) {
-      let address: string = window.location.origin;
+      const address: string = window.location.origin;
       let extendPath: string = '/admin/dashboard/over-view';
       if (user.role?.name == 'member') {
         extendPath = '/admin/profile';
@@ -105,8 +101,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   activateAccountViaEmail(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/activate-account-email';
     this.subscription.push(this.post(auth).subscribe(data => {
-      this.alertService.clear();
-      this.alertService.success(this.messageActivate, this.alertOptions);
+      this.alertService.success(this.messageActivate);
       delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
@@ -114,24 +109,21 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   sendActivateCodeViaEmail(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/send-activate-email';
     this.subscription.push(this.post(auth).subscribe(data => {
-      this.alertService.clear();
-      this.alertService.success(this.messageSendEmail, this.alertOptions);
+      this.alertService.success(this.messageSendEmail);
     }));
   }
 
   forgot(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/forgot';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageForgot, this.alertOptions);
+      this.alertService.success(this.messageForgot);
     }));
   }
 
   signUp(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/signup';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageRegister, this.alertOptions);
+      this.alertService.success(this.messageRegister);
       delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
 
@@ -140,8 +132,7 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   resetPasswordViaEmail(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/reset-password-email';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageReset, this.alertOptions);
+      this.alertService.success(this.messageReset);
       delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
@@ -149,34 +140,28 @@ export class AuthenticateService extends ApiService<IAuth> implements Authentica
   resetPasswordViaSms(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/reset-password-sms';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageReset, this.alertOptions);
+      this.alertService.success(this.messageReset);
       delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
+
   public get authValue(): IAuth {
     return this.authChange.value;
   }
 
-
   activateAccountViaSms(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/activate-account-sms';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageActivate, this.alertOptions);
+      this.alertService.success(this.messageActivate);
       delay(2000).then(() => this.router.navigate(['/home/sign-in']));
     }));
   }
 
-
   sendActivateCodeViaSms(auth: Auth): void {
     this.pageUrl = environment.baseUrl + 'auth/send-activate-sms';
     this.subscription.push(this.post(auth).subscribe(() => {
-      this.alertService.clear();
-      this.alertService.success(this.messageSendSms, this.alertOptions);
+      this.alertService.success(this.messageSendSms);
     }));
 
   }
-
-
 }

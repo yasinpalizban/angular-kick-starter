@@ -1,7 +1,7 @@
-import {IUser} from "./iuser.interface";
+import {IUser} from "./iuser";
 
 export interface IOverView {
-  user?: IUser[],
+  userPost?: IUser[],
   countPost?: {
     users: number,
     contacts: number,

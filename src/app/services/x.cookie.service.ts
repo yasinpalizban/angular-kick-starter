@@ -82,5 +82,4 @@ export class XCookieService   implements XCookieServiceInterface {
     return this.shoppingListLength.asObservable().pipe(filter(result => !!result));
   }
 
-
 }

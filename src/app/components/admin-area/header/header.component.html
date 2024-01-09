@@ -16,7 +16,7 @@
       <ul class="list-unstyled navbar__list">
 
 
-        <li *ngIf="limitUserMenuLink('dashboard')" class="has-sub">
+        <li appMenu [category]="'dashboard'"   class="has-sub">
           <a class="js-arrow" (click)="isLeftArrow.dashboard = !isLeftArrow.dashboard"
              [attr.aria-expanded]="!isLeftArrow.dashboard" aria-controls="collapseLeftArrow0">
             <fa-icon [icon]="faIcon.faTachometerAlt"></fa-icon>
@@ -27,12 +27,12 @@
           </a>
           <ul id="collapseLeftArrow0" [collapse]="isLeftArrow.dashboard" [isAnimated]="true"
               class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
+            <li  appActions [permissionType]="this.permissionType.Get" [permissionName]="'overView'">
               <a [routerLink]="[links.overView]">
                 <fa-icon [icon]="faIcon.faList"></fa-icon>
                 {{ 'layout.header.overView' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'graph'">
               <a [routerLink]="[links.graph]">
                 <fa-icon [icon]="faIcon.faChartArea"></fa-icon>
                 {{ 'layout.header.graph' | translate }}</a>
@@ -40,7 +40,7 @@
 
           </ul>
         </li>
-        <li *ngIf="limitUserMenuLink('account')" class="has-sub">
+        <li appMenu [category]="'account'"  class="has-sub">
           <a class="js-arrow" (click)="isLeftArrow.account = !isLeftArrow.account"
              [attr.aria-expanded]="!isLeftArrow.account" aria-controls="collapseLeftArrow1">
             <fa-icon [icon]="faIcon.faUsers"></fa-icon>
@@ -51,161 +51,32 @@
           </a>
           <ul id="collapseLeftArrow1" [collapse]="isLeftArrow.account" [isAnimated]="true"
               class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'group'">
               <a [routerLink]="[links.group]">
                 <fa-icon [icon]="faIcon.faUserFriends"></fa-icon>
                 {{ 'layout.header.groups' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'user'">
               <a [routerLink]="[links.users]">
                 <fa-icon [icon]="faIcon.faUserPlus"></fa-icon>
                 {{ 'layout.header.users' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permission'">
               <a [routerLink]="[links.permission]">
                 <fa-icon [icon]="faIcon.faEye"></fa-icon>
                 {{ 'layout.header.permissions' | translate }}</a>
             </li>
-            <li>
-              <a [routerLink]="[links.groupPermission]">
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permissionGroup'">
+              <a [routerLink]="[links.permissionGroup]">
                 <fa-icon [icon]="faIcon.faRandom"></fa-icon>
                 {{ 'layout.header.permissionGroups' | translate }}</a>
             </li>
-            <li>
-              <a [routerLink]="[links.userPermission]">
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permissionUser'">
+              <a [routerLink]="[links.permissionUser]">
                 <fa-icon [icon]="faIcon.faRetweet"></fa-icon>
                 {{ 'layout.header.permissionUsers' | translate }}</a>
             </li>
 
-
-          </ul>
-        </li>
-        <li *ngIf="limitUserMenuLink('blog')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.news = !isLeftArrow.news"
-             [attr.aria-expanded]="!isLeftArrow.news" aria-controls="collapseLeftArrow2">
-            <fa-icon [icon]="faIcon.faBlog"></fa-icon>
-            {{ 'layout.header.blog' | translate }}
-            <span [ngClass]="[isLeftArrow.news ? 'arrow':'arrow up']">
-                                    <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow2" [collapse]="isLeftArrow.news" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.newsPost]">
-                <fa-icon [icon]="faIcon.faNewspaper"></fa-icon>
-                {{ 'layout.header.news' | translate }} </a>
-            </li>
-            <li>
-              <a [routerLink]="[links.advertisement]">
-                <fa-icon [icon]="faIcon.faShoppingCart"></fa-icon>
-                {{ 'layout.header.advertisement' | translate }}  </a>
-            </li>
-
-
-          </ul>
-        </li>
-        <li *ngIf="limitUserMenuLink('firstPage')">
-          <a [routerLink]="[links.viewOption]">
-            <fa-icon [icon]="faIcon.faDesktop"></fa-icon>
-            {{ 'layout.header.firstPage' | translate }}</a>
-
-        </li>
-
-        <li *ngIf="limitUserMenuLink('communicate')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.communication = !isLeftArrow.communication"
-             [attr.aria-expanded]="!isLeftArrow.communication" aria-controls="collapseLeftArrow4">
-            <fa-icon [icon]="faIcon.faInbox"></fa-icon>
-            {{ 'layout.header.communication' | translate }}
-            <span [ngClass]="[isLeftArrow.communication? 'arrow':'arrow up']">
-                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow4" [collapse]="isLeftArrow.communication" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.chat]">
-                <fa-icon [icon]="faIcon.faComments"></fa-icon>
-                {{ 'layout.header.chat' | translate }} </a>
-            </li>
-
-            <li>
-              <a [routerLink]="[links.contact]">
-                <fa-icon [icon]="faIcon.faEnvelope"></fa-icon>
-                {{ 'layout.header.contact' | translate }} </a>
-            </li>
-
-          </ul>
-        </li>
-
-        <li *ngIf="limitUserMenuLink('request')">
-          <a [routerLink]="[links.request]">
-            <fa-icon [icon]="faIcon.faBookmark"></fa-icon>
-            {{ 'layout.header.request' | translate }}</a>
-          <!--          <span class="inbox-num">3</span>-->
-        </li>
-
-        <li *ngIf="limitUserMenuLink('activity')">
-          <a [routerLink]="[links.hotelActivity]">
-            <fa-icon [icon]="faIcon.faTable"></fa-icon>
-            {{ 'layout.header.myActivity' | translate }}</a>
-        </li>
-        <li *ngIf="limitUserMenuLink('fastFood')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.product = !isLeftArrow.product"
-             [attr.aria-expanded]="!isLeftArrow.product" aria-controls="collapseLeftArrow7">
-            <fa-icon [icon]="faIcon.faListAlt"></fa-icon>
-            {{ 'layout.header.product' | translate }}
-            <span [ngClass]="[isLeftArrow.product? 'arrow':'arrow up']">
-                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow7" [collapse]="isLeftArrow.product" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.fastFoodPost]">
-                <fa-icon [icon]="faIcon.faTable"></fa-icon>
-                {{ 'layout.header.fastFoodPost' | translate }} </a>
-            </li>
-
-
-            <li>
-              <a [routerLink]="[links.fastFoodOrder]">
-                <fa-icon [icon]="faIcon.faTable"></fa-icon>
-                {{ 'layout.header.fastFoodOrder' | translate }} </a>
-            </li>
-
-
-          </ul>
-        </li>
-
-        <li *ngIf="limitUserMenuLink('hotel')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.room = !isLeftArrow.room"
-             [attr.aria-expanded]="!isLeftArrow.room" aria-controls="collapseLeftArrow8">
-            <fa-icon [icon]="faIcon.faListAlt"></fa-icon>
-            {{ 'layout.header.room' | translate }}
-            <span [ngClass]="[isLeftArrow.room? 'arrow':'arrow up']">
-                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow8" [collapse]="isLeftArrow.room" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.hotelPost]">
-                <fa-icon [icon]="faIcon.faTable"></fa-icon>
-                {{ 'layout.header.hotelPost' | translate }} </a>
-            </li>
-
-
-            <li>
-              <a [routerLink]="[links.hotelOrder]">
-                <fa-icon [icon]="faIcon.faTable"></fa-icon>
-                {{ 'layout.header.hotelOrder' | translate }} </a>
-            </li>
-            <li>
-              <a [routerLink]="[links.hotelTransaction]">
-                <fa-icon [icon]="faIcon.faTable"></fa-icon>
-                {{ 'layout.header.hotelTransaction' | translate }} </a>
-            </li>
 
           </ul>
         </li>
@@ -286,7 +157,7 @@
                   <fa-icon [icon]="faIcon.faUserCircle"></fa-icon>
                   {{ 'layout.header.profile' | translate }}</a>
               </div>
-              <div *ngIf="limitUserMenuLink('setting')" class="account-dropdown__item">
+              <div  appActions [permissionType]="this.permissionType.Get" [permissionName]="'setting'"  class="account-dropdown__item">
                 <a [routerLink]="[links.setting]">
                   <fa-icon [icon]="faIcon.faTools"></fa-icon>
                   {{ 'layout.header.setting' | translate }} </a>
@@ -299,11 +170,7 @@
               </div>
             </div>
             <div class="account-dropdown__body">
-              <div *ngIf="limitUserMenuLink('setting')" class="account-dropdown__item">
-                <a [routerLink]="[this.links.visitor]">
-                  <fa-icon [icon]="faIcon.faGlobe"></fa-icon>
-                  {{ 'layout.header.visitor' | translate }} </a>
-              </div>
+
 
               <div class="account-dropdown__item">
                 <a style="cursor: pointer" (click)="changeLanguage()">
@@ -338,22 +205,22 @@
       <ul class="list-unstyled navbar__list">
         <li class="has-sub">
           <a class="js-arrow" (click)="isLeftArrow.setting = !isLeftArrow.setting"
-             [attr.aria-expanded]="!isLeftArrow.setting" aria-controls="collapseLeftArrow00">
+             [attr.aria-expanded]="!isLeftArrow.setting" aria-controls="collapseLeftArrow000">
             <fa-icon [icon]="faIcon.faUserCog"></fa-icon>
             {{ 'layout.header.setting' | translate }}
             <span [ngClass]="[isLeftArrow.setting ? 'arrow':'arrow up']">
                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
                                 </span>
           </a>
-          <ul id="collapseLeftArrow00" [collapse]="isLeftArrow.setting" [isAnimated]="true"
+          <ul id="collapseLeftArrow000" [collapse]="isLeftArrow.setting" [isAnimated]="true"
               class="list-unstyled navbar__sub-list js-sub-list">
             <li>
               <a [routerLink]="[links.profile]">
                 <fa-icon [icon]="faIcon.faUserCircle"></fa-icon>
                 {{ 'layout.header.profile' | translate }}</a>
             </li>
-            <li *ngIf="limitUserMenuLink('setting')">
-              <a [routerLink]="[links.setting]">
+            <li  appActions [permissionType]="this.permissionType.Get" [permissionName]="'setting'">
+              <a [routerLink]="[links.setting]" >
                 <fa-icon [icon]="faIcon.faCog"></fa-icon>
                 {{ 'layout.header.setting' | translate }}</a>
             </li>
@@ -361,11 +228,6 @@
               <a style="cursor: pointer" (click)="onSignOut()">
                 <fa-icon [icon]="faIcon.faSignOutAlt"></fa-icon>
                 {{ 'layout.header.signOut' | translate }}</a>
-            </li>
-            <li *ngIf="limitUserMenuLink('setting')">
-              <a [routerLink]="[links.visitor]">
-                <fa-icon [icon]="faIcon.faGlobe"></fa-icon>
-                {{ 'layout.header.visitor' | translate }}</a>
             </li>
             <li>
               <a style="cursor: pointer" (click)="changeLanguage()">
@@ -375,23 +237,23 @@
           </ul>
         </li>
 
-        <li *ngIf="limitUserMenuLink('dashboard')" class="has-sub">
+        <li appMenu [category]="'dashboard'"  class="has-sub">
           <a class="js-arrow" (click)="isLeftArrow.dashboard = !isLeftArrow.dashboard"
-             [attr.aria-expanded]="!isLeftArrow.dashboard" aria-controls="collapseLeftArrow0">
+             [attr.aria-expanded]="!isLeftArrow.dashboard" aria-controls="collapseLeftArrow00">
             <fa-icon [icon]="faIcon.faTachometerAlt"></fa-icon>
             {{ 'layout.header.dashboard' | translate }}
             <span [ngClass]="[isLeftArrow.dashboard ? 'arrow':'arrow up']">
                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
                                 </span>
           </a>
-          <ul id="collapseLeftArrow0" [collapse]="isLeftArrow.dashboard" [isAnimated]="true"
+          <ul id="collapseLeftArrow00" [collapse]="isLeftArrow.dashboard" [isAnimated]="true"
               class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'overView'">
               <a [routerLink]="[links.overView]">
                 <fa-icon [icon]="faIcon.faList"></fa-icon>
                 {{ 'layout.header.overView' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'graph'">
               <a [routerLink]="[links.graph]">
                 <fa-icon [icon]="faIcon.faChartArea"></fa-icon>
                 {{ 'layout.header.graph' | translate }}</a>
@@ -399,112 +261,45 @@
 
           </ul>
         </li>
-        <li *ngIf="limitUserMenuLink('account')" class="has-sub">
+        <li appMenu [category]="'account'"  class="has-sub">
           <a class="js-arrow" (click)="isLeftArrow.account = !isLeftArrow.account"
-             [attr.aria-expanded]="!isLeftArrow.account" aria-controls="collapseLeftArrow1">
+             [attr.aria-expanded]="!isLeftArrow.account" aria-controls="collapseLeftArrow11">
             <fa-icon [icon]="faIcon.faUsers"></fa-icon>
             {{ 'layout.header.accounts' | translate }}
             <span [ngClass]="[isLeftArrow.account ? 'arrow':'arrow up']">
                                     <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
                                 </span>
           </a>
-          <ul id="collapseLeftArrow1" [collapse]="isLeftArrow.account" [isAnimated]="true"
+          <ul id="collapseLeftArrow11" [collapse]="isLeftArrow.account" [isAnimated]="true"
               class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'group'">
               <a [routerLink]="[links.group]">
                 <fa-icon [icon]="faIcon.faUserFriends"></fa-icon>
                 {{ 'layout.header.groups' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'user'">
               <a [routerLink]="[links.users]">
                 <fa-icon [icon]="faIcon.faUserPlus"></fa-icon>
                 {{ 'layout.header.users' | translate }}</a>
             </li>
-            <li>
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permission'">
               <a [routerLink]="[links.permission]">
                 <fa-icon [icon]="faIcon.faEye"></fa-icon>
                 {{ 'layout.header.permissions' | translate }}</a>
             </li>
-            <li>
-              <a [routerLink]="[links.groupPermission]">
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permisionGroup'">
+              <a [routerLink]="[links.permissionGroup]">
                 <fa-icon [icon]="faIcon.faRandom"></fa-icon>
                 {{ 'layout.header.permissionGroups' | translate }}</a>
             </li>
-            <li>
-              <a [routerLink]="[links.userPermission]">
+            <li appActions [permissionType]="this.permissionType.Get" [permissionName]="'permissionUser'">
+              <a [routerLink]="[links.permissionUser]">
                 <fa-icon [icon]="faIcon.faRetweet"></fa-icon>
                 {{ 'layout.header.permissionUsers' | translate }}</a>
             </li>
 
-
           </ul>
         </li>
-        <li *ngIf="limitUserMenuLink('blog')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.news = !isLeftArrow.news"
-             [attr.aria-expanded]="!isLeftArrow.news" aria-controls="collapseLeftArrow2">
-            <fa-icon [icon]="faIcon.faBlog"></fa-icon>
-            {{ 'layout.header.blog' | translate }}
-            <span [ngClass]="[isLeftArrow.news ? 'arrow':'arrow up']">
-                                    <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow2" [collapse]="isLeftArrow.news" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.newsPost]">
-                <fa-icon [icon]="faIcon.faNewspaper"></fa-icon>
-                {{ 'layout.header.news' | translate }} </a>
-            </li>
-            <li>
-              <a [routerLink]="[links.advertisement]">
-                <fa-icon [icon]="faIcon.faShoppingCart"></fa-icon>
-                {{ 'layout.header.advertisement' | translate }}  </a>
-            </li>
-
-
-          </ul>
-        </li>
-        <li *ngIf="limitUserMenuLink('firstPage')">
-          <a [routerLink]="[links.viewOption]">
-            <fa-icon [icon]="faIcon.faDesktop"></fa-icon>
-            {{ 'layout.header.firstPage' | translate }}</a>
-
-        </li>
-
-        <li *ngIf="limitUserMenuLink('communicate')" class="active has-sub">
-          <a class="js-arrow" (click)="isLeftArrow.communication = !isLeftArrow.communication"
-             [attr.aria-expanded]="!isLeftArrow.communication" aria-controls="collapseLeftArrow4">
-            <fa-icon [icon]="faIcon.faInbox"></fa-icon>
-            {{ 'layout.header.communication' | translate }}
-            <span [ngClass]="[isLeftArrow.communication? 'arrow':'arrow up']">
-                                   <fa-icon [icon]="faIcon.faAngleDown"></fa-icon>
-                                </span>
-          </a>
-          <ul id="collapseLeftArrow4" [collapse]="isLeftArrow.communication" [isAnimated]="true"
-              class="list-unstyled navbar__sub-list js-sub-list">
-            <li>
-              <a [routerLink]="[links.chat]">
-                <fa-icon [icon]="faIcon.faComments"></fa-icon>
-                {{ 'layout.header.chat' | translate }} </a>
-            </li>
-
-            <li>
-              <a [routerLink]="[links.contact]">
-                <fa-icon [icon]="faIcon.faEnvelope"></fa-icon>
-                {{ 'layout.header.contact' | translate }} </a>
-            </li>
-
-          </ul>
-        </li>
-
-        <li *ngIf="limitUserMenuLink('request')">
-          <a [routerLink]="[links.request]">
-            <fa-icon [icon]="faIcon.faBookmark"></fa-icon>
-            {{ 'layout.header.request' | translate }}</a>
-          <!--          <span class="inbox-num">3</span>-->
-        </li>
-
-
       </ul>
     </nav>
   </div>
@@ -529,9 +324,6 @@
 
               </ul>
             </div>
-            <!--            <button class="au-btn au-btn-icon au-btn&#45;&#45;green">-->
-            <!--              <i class="fa fa-plus"></i>add item-->
-            <!--            </button>-->
           </div>
         </div>
       </div>

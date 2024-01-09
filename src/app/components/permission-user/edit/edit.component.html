@@ -17,7 +17,7 @@
         class="form-control"
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let group of this.group?.data; let i=index" value="{{group.name}}">{{group.id}}</option>
+        <option *ngFor="let item of this.group; let i=index" value="{{item.name}}">{{item.id}}</option>
 
       </select>
       <div class="input-group-addon">
@@ -40,8 +40,8 @@
         [ngClass]="{ 'is-invalid': formGroup.controls?.['userId']?.invalid  && formGroup.controls?.['userId']?.touched }"
       >
         <option disabled  value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option  selected value="{{this.permissionUser.data![0].userId}}">{{this.permissionUser.data![0].username+' ('+this.permissionUser.data![0].firstName+'  '+this.permissionUser.data![0].lastName+ ')'}}</option>
-        <option *ngFor="let user of this.users?.data; let i=index" value="{{user.id}}">{{user.username+' ('+user.firstName+'  '+user.lastName+ ')'}}</option>
+        <option  selected value="{{this.permissionUser.userId}}">{{this.permissionUser.username+' ('+this.permissionUser.firstName+'  '+this.permissionUser.lastName+ ')'}}</option>
+        <option *ngFor="let item of this.users; let i=index" value="{{item.id}}">{{item.username+' ('+item.firstName+'  '+item.lastName+ ')'}}</option>
 
       </select>
       <div class="input-group-addon">
@@ -71,8 +71,8 @@
         [ngClass]="{ 'is-invalid': formGroup.controls?.['permissionId']?.invalid  && formGroup.controls?.['permissionId']?.touched }"
       >
         <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>
-        <option *ngFor="let permission of this.permission?.data; let i=index"
-                value="{{permission.id}}">{{permission.name}}</option>
+        <option *ngFor="let item of this.permission; let i=index"
+                value="{{item.id}}">{{item.name}}</option>
       </select>
       <div class="input-group-addon">
         <fa-icon [icon]="faIcon.faAsterisk"></fa-icon>
@@ -94,25 +94,11 @@
       <div class="input-group-addon">{{ 'filed.actions' | translate }}</div>
 
       <div class="form-control form-check-inline form-check" style="border: none">
-        <!--        <label *ngFor="let act of this.actionsArray; let i = index"-->
-        <!--               for="inline-checkbox1"-->
-        <!--               class="switch switch-text switch-primary switch-pill m-r-10 m-l-20">-->
-        <!--          <input-->
-        <!--            (change)="onCheckboxChange($event)"-->
-        <!--            type="checkbox"-->
-        <!--            id="inline-checkbox1"-->
-        <!--            value="{{act.value}}"-->
-        <!--            class="form-check-input witch-input">{{ act.name}}-->
-
-        <!--        </label>-->
-
         <label style="  transform: scale(1)" class="switch switch-text switch-primary switch-pill lg m-r-10 m-l-20">
           <input  value="-get" (change)="onCheckboxChange($event)" type="checkbox" class="switch-input " [checked]="isGet" >
           <span data-on="Get" data-off="Get" class="switch-label"></span>
           <span class="switch-handle"></span>
         </label>
-
-
 
         <label style="  transform: scale(1)" class="switch switch-text switch-success switch-pill m-r-5 m-l-5">
           <input value="-post" (change)="onCheckboxChange($event)" type="checkbox" class="switch-input" [checked]="isPost" >

@@ -1,10 +1,9 @@
 import {Component,  OnDestroy, OnInit} from '@angular/core';
 import {switchMap, takeUntil} from 'rxjs';
 import {ActivatedRoute,  Router} from '@angular/router';
-import {IQuery} from '../../../interfaces/iquery.interface';
-import {IPermission} from "../../../interfaces/ipermission.interface";
+import {IQuery} from '../../../interfaces/iquery';
+import {IPermission} from "../../../interfaces/ipermission";
 import {PermissionService} from "../../../services/permission.service";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicDetail} from "../../../abstracts/basic.detail";
 import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 
@@ -15,7 +14,7 @@ import {PERMISSION_SERVICE} from "../../../configs/path.constants";
 })
 export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
-  permission!: IResponseObject<IPermission>;
+  permission!: IPermission;
 
   constructor(
     private permissionService: PermissionService,
@@ -25,9 +24,9 @@ export class DetailComponent extends BasicDetail implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.activatedRoute.params.pipe(takeUntil(this.subscription$),
-      switchMap((params) => this.permissionService.query(+params['id'])
-      )).subscribe((data) => {
-      this.permission = data;
+      switchMap((params) => this.permissionService.detail(+params['id'])
+      )).subscribe((value) => {
+      this.permission = value.data;
     });
 
     this.permissionService.getQueryArgumentObservable().pipe(takeUntil(this.subscription$)).subscribe((qParams: IQuery) => {

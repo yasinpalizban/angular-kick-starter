@@ -4,10 +4,9 @@ import {GroupService} from '../../../services/group.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import { BsModalService, ModalOptions} from 'ngx-bootstrap/modal';
 import {PageChangedEvent} from 'ngx-bootstrap/pagination';
-import {IQuery} from '../../../interfaces/iquery.interface';
-import {IGroup} from '../../../interfaces/igroup.interface';
+import {IQuery} from '../../../interfaces/iquery';
+import {IGroup} from '../../../interfaces/igroup';
 import {faEdit, faTrash, faEnvelopeOpen} from '@fortawesome/free-solid-svg-icons';
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicList} from "../../../abstracts/basic.list";
 import {ModalComponent} from "../../../commons/modal/modal.component";
 import {GROUP_SERVICE} from "../../../configs/path.constants";
@@ -22,7 +21,7 @@ import {take} from "rxjs/operators";
 })
 export class ListComponent extends BasicList implements OnInit, OnDestroy {
   faIcon = {faEdit, faTrash, faEnvelopeOpen};
-  group!: IResponseObject<IGroup>;
+  group!: IGroup[];
 
   constructor(public groupService: GroupService,
               private router: Router,
@@ -37,12 +36,12 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
     this.activatedRoute.queryParams.pipe(takeUntil(this.subscription$),
       mergeMap((params) => {
         this.groupService.setQueryArgument(params);
-        return this.groupService.query(params);
-      })).subscribe((data) => {
-      this.group = data;
-      if (data.pager) {
-        this.totalPage = data.pager!.total;
-        this.currentPage = data.pager!.currentPage+1;
+        return this.groupService.retrieve(params);
+      })).subscribe((value) => {
+      this.group = value.data;
+      if (value.pager) {
+        this.totalPage = value.pager!.total;
+        this.currentPage = value.pager!.currentPage+1;
       }
     });
   }
@@ -61,21 +60,17 @@ export class ListComponent extends BasicList implements OnInit, OnDestroy {
   }
 
   onOpenModal(id: number, index: number): void {
-
-    this.deleteId = id;
-    this.deleteIndex = index;
-    this.deleteItem = this.group.data![index].name;
     const initialState: ModalOptions = {
       initialState: {
-        deleteItem: this.deleteItem,
+        deleteItem: this.group[index].name
       }
     };
     this.modalRef = this.modalService.show(ModalComponent, initialState);
     this.modalRef.content.onClose = new Subject<boolean>();
     this.modalRef.content.onClose.pipe(takeUntil(this.subscription$)).subscribe((result: boolean) => {
       if (result) {
-        this.groupService.remove(this.deleteId);
-        this.group.data!.splice(this.deleteIndex, 1);
+        this.groupService.remove(id);
+        this.group.splice(index);
       }
     });
   }

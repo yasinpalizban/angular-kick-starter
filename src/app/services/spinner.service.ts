@@ -17,5 +17,4 @@ export class SpinnerService {
   hide() {
     this._loading.next(false);
   }
-
 }

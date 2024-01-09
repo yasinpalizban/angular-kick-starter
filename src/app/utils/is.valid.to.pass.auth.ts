@@ -1,4 +1,4 @@
-import {IAuth} from "../interfaces/iauthenticate.interface";
+import {IAuth} from "../interfaces/iauthenticate";
 
 export function isValidToPassAuth(permissionName: string, permissionType: string, user: IAuth): boolean {
   let isAllowed: boolean = false;

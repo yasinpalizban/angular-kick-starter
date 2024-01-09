@@ -3,13 +3,11 @@ import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import {PermissionGroupService} from "../../../services/permission.group.service";
 import {PermissionGroup} from "../../../models/permission.group.model";
-import {IGroup} from "../../../interfaces/igroup.interface";
+import {IGroup} from "../../../interfaces/igroup";
 import {GroupService} from "../../../services/group.service";
 import {takeUntil} from "rxjs";
-import {IPermission} from "../../../interfaces/ipermission.interface";
+import {IPermission} from "../../../interfaces/ipermission";
 import {PermissionService} from "../../../services/permission.service";
-import {PermissionType} from "../../../enums/permission.enum";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {Router} from "@angular/router";
 
@@ -22,8 +20,8 @@ import {Router} from "@angular/router";
 export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
 
-  group!: IResponseObject<IGroup>;
-  permission!: IResponseObject<IPermission>;
+  group!: IGroup[];
+  permission!: IPermission[];
 
 
   constructor(private formBuilder: FormBuilder,
@@ -55,27 +53,23 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initForm();
     this.initData();
-
   }
 
   private initData(): void {
-    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.group = data;
+    this.groupService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.group = value.data;
     })
 
-
-    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.permission = data;
+    this.permissionService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.permission = value.data;
     });
   }
 
   onSubmit(): void {
 
-
     if (this.formGroup.invalid) {
       return;
     }
-
     this.submitted = true;
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     let combineAction = '';
@@ -84,12 +78,9 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
       permissionId: this.formGroup.value.permissionId,
       groupId: this.formGroup.value.groupId,
       actions: combineAction
-
     });
-
     this.permissionGroupService.clearAlert();
     this.permissionGroupService.save(permission);
-
   }
 
   override ngOnDestroy(): void {
@@ -99,17 +90,13 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
 
 
   onCheckboxChange(e: any) {
-
     const actions: FormArray = this.formGroup.get('actions') as FormArray;
     if (e.target.checked) {
       actions.push(new FormControl(e.target.value));
     } else {
       const index = actions.controls.findIndex(x => x.value === e.target.value);
-
       actions.removeAt(index);
     }
-
-
   }
 }
 

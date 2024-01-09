@@ -21,6 +21,7 @@ import {SearchingFiledComponent} from "./commons/searching-filed/searching.filed
 import {ModalComponent} from "./commons/modal/modal.component";
 import {ToastComponent} from "./commons/toast/toast.component";
 import {ActionDirective} from "./directive/action.directive";
+import {MenuDirective} from "./directive/menu.directive";
 @NgModule({
   declarations: [
     AlertComponent,
@@ -31,7 +32,8 @@ import {ActionDirective} from "./directive/action.directive";
     SearchingFiledComponent,
     ModalComponent,
     ToastComponent,
-    ActionDirective
+    ActionDirective,
+    MenuDirective
   ],
   imports: [
     CommonModule,
@@ -68,6 +70,7 @@ import {ActionDirective} from "./directive/action.directive";
     FontAwesomeModule,
     Ng2SearchPipeModule,
     ActionDirective,
+    MenuDirective
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 

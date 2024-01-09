@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {IAuth} from "../interfaces/iauthenticate.interface";
+import {IAuth} from "../interfaces/iauthenticate";
 import {map, take} from "rxjs/operators";
 
 interface AuthCheckerServiceInterface {

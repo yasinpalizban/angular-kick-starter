@@ -26,16 +26,9 @@ export class GlobalConstants {
   public static limitUserMenu: {
     [key: string]: string[]
   } = {
-    account: [RoleType.Admin],
-    firstPage: [RoleType.Admin, RoleType.Coworker],
-    blog: [RoleType.Admin, RoleType.Blogger, RoleType.Coworker],
-    communicate: [RoleType.Admin, RoleType.Coworker],
-    fastFood: [RoleType.Admin, RoleType.Coworker],
-    hotel: [RoleType.Admin, RoleType.Coworker],
-    dashboard: [RoleType.Admin, RoleType.Coworker, RoleType.Blogger],
-    request: [RoleType.Admin, RoleType.Coworker, RoleType.Member],
-    setting: [RoleType.Admin, RoleType.Blogger, RoleType.Coworker],
-    activity: [RoleType.Member],
+    account: ['user','graph','user', 'permission','permissionUser','permissionGroup'],
+    dashboard: ['overView','graph'],
+
   };
 
 }

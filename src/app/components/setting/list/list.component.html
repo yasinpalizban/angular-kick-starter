@@ -14,33 +14,33 @@
     </tr>
     </thead>
     <tbody>
-    <tr class="tr-shadow" *ngFor=" let setting of this.setting?.data; let i= index;">
+    <tr class="tr-shadow" *ngFor=" let item of this.setting; let i= index;">
       <td>{{i + 1}}</td>
       <td>
-        <span class="block-email">{{setting.key}}</span>
+        <span class="block-email">{{item.key}}</span>
       </td>
-      <td class="desc">{{setting.value.substr(0,20)}}</td>
+      <td class="desc">{{item.value.substr(0,20)}}</td>
 
       <td>
 
-        <span *ngIf="setting.status==true" class="status--process">{{ 'filed.activate' | translate }}</span>
-        <span *ngIf="setting.status==false" class="status--denied">{{ 'filed.deActivate' | translate }}</span>
+        <span *ngIf="item.status==true" class="status--process">{{ 'filed.activate' | translate }}</span>
+        <span *ngIf="item.status==false" class="status--denied">{{ 'filed.deActivate' | translate }}</span>
 
       </td>
       <td>
-        <span class="">{{setting.createdAt|date}}</span>
+        <span class="">{{item.createdAt|date}}</span>
       </td>
 
       <td>
         <div class="table-data-feature">
 
-          <button  appActions [permissionType]="'put'" [permissionName]="'setting'"   tooltip="{{ 'common.edit' | translate }}"  (click)="onEditItem(setting.id)" class="item" data-toggle="tooltip">
+          <button  appActions [permissionType]="this.permissionType.Put" [permissionName]="this.permissionName"    tooltip="{{ 'common.edit' | translate }}"  (click)="onEditItem(item.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEdit" ></fa-icon>
           </button>
-          <button  appActions  [permissionType]="'delete'" [permissionName]="'setting'"  tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(setting.id,i)" class="item" data-toggle="tooltip">
+          <button  appActions  [permissionType]="this.permissionType.Delete" [permissionName]="this.permissionName"   tooltip="{{ 'common.remove' | translate }}" (click)="onOpenModal(item.id,i)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faTrash" ></fa-icon>
           </button>
-          <button appActions [permissionType]="'get'" [permissionName]="'setting'"   tooltip="{{ 'common.detail' | translate }}"  (click)="onDetailItem(setting.id)" class="item" data-toggle="tooltip">
+          <button appActions [permissionType]="this.permissionType.Get" [permissionName]="this.permissionName"    tooltip="{{ 'common.detail' | translate }}"  (click)="onDetailItem(item.id)" class="item" data-toggle="tooltip">
             <fa-icon   [icon]="faIcon.faEnvelopeOpen" ></fa-icon>
           </button>
         </div>

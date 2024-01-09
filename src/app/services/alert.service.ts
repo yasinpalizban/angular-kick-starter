@@ -3,7 +3,7 @@ import {Observable, Subject} from 'rxjs';
 import {Alert} from '../models/alert.model';
 import {filter} from 'rxjs/operators';
 import {AlertType} from '../enums/alert.enum';
-import {IAlert} from '../interfaces/ialert.interface';
+import {IAlert} from '../interfaces/ialert';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,7 @@ import {IAlert} from '../interfaces/ialert.interface';
 export class AlertService {
   private subject = new Subject<Alert>();
   private defaultId = 'default-alert';
-  alertOptions: IAlert ={
+  alertOptions: IAlert = {
     autoClose: true,
     keepAfterRouteChange: false,
     body: []
@@ -30,6 +30,8 @@ export class AlertService {
 
   success(message: string, options?: any): void {
     this.clear();
+    if (!options)
+      options = this.alertOption;
     this.alert(new Alert({...options, type: AlertType.Success, message}));
   }
 

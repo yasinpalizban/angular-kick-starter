@@ -9,7 +9,7 @@ import {
 } from '@angular/router';
 import {Observable} from 'rxjs';
 import {AuthenticateCheckerService} from "../services/authenticate.checker.service";
-import {IAuth} from "../interfaces/iauthenticate.interface";
+import {IAuth} from "../interfaces/iauthenticate";
 
 @Injectable({
   providedIn: 'root'

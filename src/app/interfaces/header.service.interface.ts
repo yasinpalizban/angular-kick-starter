@@ -1,5 +1,5 @@
 import {Observable} from "rxjs";
-import {INotification} from "./inotification.interface";
+import {INotification} from "./inotification";
 
 export interface HeaderServiceInterface {
   checkUrlParams(): void;

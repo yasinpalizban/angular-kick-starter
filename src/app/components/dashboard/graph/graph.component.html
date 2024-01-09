@@ -105,39 +105,6 @@
 
             </div>
           </div>
-          <!--          <div class="form-group">-->
-          <!--            <div class="input-group">-->
-          <!--              <div class="input-group-addon">{{ 'dashboard.date' | translate }}</div>-->
-          <!--              <select-->
-
-          <!--                id="date"-->
-          <!--                name="date"-->
-          <!--                class="form-control"-->
-          <!--                formControlName="date"-->
-
-          <!--                [ngClass]="{ 'is-invalid': formGroup.controls.date.invalid  && formGroup.controls.date.touched }"-->
-          <!--                [value]=""-->
-          <!--              >-->
-          <!--                <option disabled selected value>{{ 'common.selectInputMessage' | translate }}</option>-->
-          <!--                <option value="today">{{ 'dashboard.today' | translate }}</option>-->
-          <!--                <option value="lastWeek">{{ 'dashboard.lastWeek' | translate }}</option>-->
-          <!--                <option value="lastMonth">{{ 'dashboard.lastMonth' | translate }}</option>-->
-
-          <!--              </select>-->
-          <!--              <div class="input-group-addon">-->
-          <!--                <fa-icon [icon]="faIcon.faCalendar"></fa-icon>-->
-          <!--              </div>-->
-
-          <!--              <div-->
-          <!--                *ngIf=" !submitted &&formGroup.controls.date.invalid ||formGroup.controls.date.touched"-->
-          <!--                class="invalid-feedback">-->
-          <!--                <div *ngIf="formGroup.controls.date.hasError('required')"-->
-          <!--                     class="pull-right">{{ 'common.required' | translate }}-->
-          <!--                </div>-->
-
-          <!--              </div>-->
-          <!--            </div>-->
-          <!--          </div>-->
           <div class="form-group">
             <div class="input-group">
               <div class="input-group-addon">{{ 'dashboard.fromDate' | translate }}</div>
@@ -218,7 +185,7 @@
         <ngx-charts-bar-vertical
           [view]="[600, 400]"
           [scheme]="colorScheme"
-          [results]="graph.data!"
+          [results]="graph"
           [gradient]="gradient"
           [xAxis]="showXAxis"
           [yAxis]="showYAxis"
@@ -243,7 +210,7 @@
         <!-- DATA TABLE-->
 
         <ngx-charts-pie-chart
-          [results]="graph.data!"
+          [results]="graph"
           [legend]="true"
           [legendTitle]="'Product Sale Report'"
           [view]="[600,400]"
@@ -262,7 +229,7 @@
         <!-- DATA TABLE-->
 
         <ngx-charts-pie-grid
-          [results]="graph.data!">
+          [results]="graph">
         </ngx-charts-pie-grid>
       </div>
     </div>

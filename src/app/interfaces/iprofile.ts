@@ -1,4 +1,4 @@
-import {IBasic} from "./ibasic.interface";
+import {IBasic} from "./ibasic";
 
 export interface IProfile extends  IBasic {
     username: string,

@@ -3,14 +3,14 @@ import {FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import {PermissionUserService} from "../../../services/permission.user.service";
 import {PermissionUser} from "../../../models/permission.user.model";
-import {IGroup} from "../../../interfaces/igroup.interface";
+import {IGroup} from "../../../interfaces/igroup";
 import {GroupService} from "../../../services/group.service";
 import {takeUntil} from "rxjs";
-import {IPermission} from "../../../interfaces/ipermission.interface";
+import {IPermission} from "../../../interfaces/ipermission";
 import {PermissionService} from "../../../services/permission.service";
 import {UserService} from "../../../services/user.service";
-import {IUser} from "../../../interfaces/iuser.interface";
-import {IResponseObject} from "../../../interfaces/iresponse.object.interface";
+import {IUser} from "../../../interfaces/iuser";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
 import {BasicForm} from "../../../abstracts/basic.form";
 import {Router} from "@angular/router";
 
@@ -23,9 +23,9 @@ import {Router} from "@angular/router";
 export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   faIcon = {faAsterisk};
 
-  group!: IResponseObject<IGroup>;
-  permission!: IResponseObject<IPermission>;
-  users!: IResponseObject<IUser>;
+  group!: IGroup[];
+  permission!: IPermission[];
+  users!: IUser[];
   constructor(private formBuilder: FormBuilder,
               private groupService: GroupService,
               private permissionService: PermissionService,
@@ -58,11 +58,11 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
   }
 
   private initData(): void {
-    this.groupService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.group = data;
+    this.groupService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.group = value.data;
     });
-    this.permissionService.query().pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.permission = data;
+    this.permissionService.retrieve().pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.permission = value.data;
     });
   }
 
@@ -105,8 +105,8 @@ export class AddComponent extends BasicForm implements OnInit, OnDestroy {
 
   onChangeGroup(value: any): void {
     const queryParam = `foreignKey=${value.target.value}`;
-    this.userService.query(queryParam).pipe(takeUntil(this.subscription$)).subscribe((data) => {
-      this.users = data;
+    this.userService.retrieve(queryParam).pipe(takeUntil(this.subscription$)).subscribe((value) => {
+      this.users = value.data;
     });
 
   }
